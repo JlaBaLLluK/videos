@@ -1,0 +1,28 @@
+# See https://pre-commit.com for more information
+
+default_language_version:
+    python: python3.12
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args: [ --fix, --show-fixes]
+        stages: [commit-msg, pre-commit]
+
+      - id: ruff-format
+        stages: [commit-msg, pre-commit]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        stages: [commit-msg, pre-commit]
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.31.0
+    hooks:
+        - id: commitizen
+          stages: [commit-msg, pre-commit]
