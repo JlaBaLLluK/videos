@@ -1,0 +1,9 @@
+FROM node:22-slim
+
+WORKDIR /front
+COPY ../frontend/package* .
+RUN npm ci
+
+COPY ../frontend .
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host"]

@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: ../
+      dockerfile: docker/dockerfile_back
+    image: "videos_back"
+    container_name: "videos_back"
+    ports:
+      - "8000:8888"
+    volumes:
+      - "../backend:/back"
+    env_file:
+      - "../.env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../
+      dockerfile: docker/dockerfile_front
+    image: "videos_front"
+    container_name: "videos_front"
+    ports:
+      - "5173:5173"
+    volumes:
+      - "../frontend:/front"
+    depends_on:
+      backend:
+        condition: service_started
+  postgres:
+    image: "postgres:latest"
+    container_name: "postgres"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - "../.env"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "videos"]
+      interval: 1s
+      retries: 10
+      start_period: 15s
+
+volumes:
+  db_data:
