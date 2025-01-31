@@ -11,6 +11,8 @@ services:
       - "../backend:/back"
     env_file:
       - "../.env"
+    environment:
+      - POSTGRES_HOST=postgres
     depends_on:
       postgres:
         condition: service_healthy
