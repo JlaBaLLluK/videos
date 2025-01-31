@@ -6,7 +6,7 @@ services:
     image: "videos_back"
     container_name: "videos_back"
     ports:
-      - "8000:8888"
+      - "8000:8000"
     volumes:
       - "../backend:/back"
     env_file:
@@ -24,7 +24,7 @@ services:
     image: "videos_front"
     container_name: "videos_front"
     ports:
-      - "5173:5173"
+      - "5000:5173"
     volumes:
       - "../frontend:/front"
     depends_on:
