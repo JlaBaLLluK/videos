@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
+from drf_spectacular import views as spectacular_views
 
 api_v1_urls = [
     path(
@@ -14,6 +15,8 @@ api_v1_urls = [
         ),
     ),
     path("core/", include("core.urls")),
+    path("swagger/", spectacular_views.SpectacularSwaggerView.as_view()),
+    path("schema/", spectacular_views.SpectacularAPIView.as_view(), name="schema"),
 ]
 
 urlpatterns = [
