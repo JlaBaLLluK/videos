@@ -4,5 +4,10 @@ from django.contrib.auth.models import AbstractUser
 from core import mixins as core_mixins
 
 
+def profile_photo_upload_to(instance, filename):
+    return f"logos/{instance.id}/logo.{filename.split(".")[-1]}"
+
+
 class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
     email = models.EmailField("email", unique=True)
+    profile_photo = models.ImageField(upload_to=profile_photo_upload_to, blank=True)

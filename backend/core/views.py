@@ -2,7 +2,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 
 from core import models as core_models
@@ -13,7 +14,7 @@ from core import permissions as core_permissions
 @extend_schema_view(
     list=extend_schema(description="List or users"),
     create=extend_schema(description="Create new user"),
-    retreive=extend_schema(description="Get single user by id"),
+    retrieve=extend_schema(description="Get single user by id"),
     update=extend_schema(description="User update"),
     partial_update=extend_schema(description="Partial user update"),
     destroy=extend_schema(description="User delete"),
@@ -51,12 +52,19 @@ class UserViewSet(viewsets.ModelViewSet):
                 description="A unique integer value identifying this user.",
                 location=OpenApiParameter.PATH,
                 required=True,
-                type=int
+                type=int,
             )
         ],
         request=core_serializers.UpdatePasswordSerializer,
     )
-    @action(methods=["PATCH",], detail=True, url_path="change-password", serializer_class=core_serializers.UpdatePasswordSerializer)
+    @action(
+        methods=[
+            "PATCH",
+        ],
+        detail=True,
+        url_path="change-password",
+        serializer_class=core_serializers.UpdatePasswordSerializer,
+    )
     def change_password(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -64,3 +72,12 @@ class UserViewSet(viewsets.ModelViewSet):
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         return Response({"success": "Password updated successfully"})
+
+    def perform_create(self, serializer):
+        instance = serializer.save(profile_photo="")
+        profile_photo = serializer.validated_data["profile_photo"]
+        photo_content = ContentFile(profile_photo.read())
+        photo_path = core_models.profile_photo_upload_to(instance, profile_photo.name)
+        instance.profile_photo = photo_path
+        instance.save()
+        default_storage.save(photo_path, photo_content)
