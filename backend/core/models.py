@@ -5,4 +5,4 @@ from core import mixins as core_mixins
 
 
 class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
-    email = models.EmailField("Электронная почта")
+    email = models.EmailField("email", unique=True)

@@ -1,4 +1,5 @@
 asgiref==3.8.1
+attrs==25.1.0
 cfgv==3.4.0
 distlib==0.3.9
 Django==5.1.5
@@ -6,13 +7,21 @@ django-cors-headers==4.6.0
 django-environ==0.12.0
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
+drf-spectacular==0.28.0
 filelock==3.17.0
 identify==2.6.6
+inflection==0.5.1
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
 nodeenv==1.9.1
 platformdirs==4.3.6
 pre_commit==4.1.0
 psycopg2-binary==2.9.10
 PyJWT==2.10.1
 PyYAML==6.0.2
+referencing==0.36.2
+rpds-py==0.22.3
 sqlparse==0.5.3
+typing_extensions==4.12.2
+uritemplate==4.1.1
 virtualenv==20.29.1
