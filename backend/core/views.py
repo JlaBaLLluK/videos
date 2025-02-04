@@ -9,6 +9,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
 from core import models as core_models
 from core import serializers as core_serializers
 from core import permissions as core_permissions
+from core import utils as core_utils
 
 
 @extend_schema_view(
@@ -81,3 +82,8 @@ class UserViewSet(viewsets.ModelViewSet):
         instance.profile_photo = photo_path
         instance.save()
         default_storage.save(photo_path, photo_content)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        instance.profile_photo.delete(save=False)
+        super().perform_update(serializer)
