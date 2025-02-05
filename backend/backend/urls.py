@@ -17,6 +17,8 @@ api_v1_urls = [
         ),
     ),
     path("core/", include("core.urls")),
+    path("video/", include("video.urls")),
+    # drf-spectacular urls
     path("swagger/", spectacular_views.SpectacularSwaggerView.as_view()),
     path("schema/", spectacular_views.SpectacularAPIView.as_view(), name="schema"),
 ]
