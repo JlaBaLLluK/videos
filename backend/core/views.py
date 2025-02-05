@@ -9,7 +9,6 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
 from core import models as core_models
 from core import serializers as core_serializers
 from core import permissions as core_permissions
-from core import utils as core_utils
 
 
 @extend_schema_view(
@@ -20,11 +19,7 @@ from core import utils as core_utils
     partial_update=extend_schema(description="Partial user update"),
     destroy=extend_schema(description="User delete"),
 )
-@extend_schema(
-    tags=[
-        "User",
-    ]
-)
+@extend_schema(tags=["User"])
 class UserViewSet(viewsets.ModelViewSet):
     queryset = core_models.User.objects.filter()
     serializer_class = core_serializers.UserSerializer
@@ -59,9 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
         request=core_serializers.UpdatePasswordSerializer,
     )
     @action(
-        methods=[
-            "PATCH",
-        ],
+        methods=["PATCH"],
         detail=True,
         url_path="change-password",
         serializer_class=core_serializers.UpdatePasswordSerializer,
