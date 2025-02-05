@@ -9,8 +9,6 @@ class PasswordField(serializers.CharField):
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
-    profile_photo = serializers.ImageField(required=False)
-
     class Meta:
         model = core_models.User
         fields = (

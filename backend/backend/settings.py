@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # project apps
     "core",
+    "video",
     # third-party apps
     "rest_framework",
     "corsheaders",

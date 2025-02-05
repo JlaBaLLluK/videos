@@ -1,0 +1,58 @@
+from django.db import models
+
+from core import mixins as core_mixins
+
+
+def video_upload_to(instance, filename):
+    return (
+        f"videos/{instance.created_by.id}/{instance.id}/video.{filename.split(".")[-1]}"
+    )
+
+
+def video_preview_upload_to(instance, filename):
+    return (
+        f"videos/{instance.created_by}/{instance.id}/preview.{filename.split(".")[-1]}"
+    )
+
+
+class Video(core_mixins.CreatedUpdatedMixin):
+    video = models.FileField(upload_to=video_upload_to)
+    preview = models.ImageField(upload_to=video_preview_upload_to, blank=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    author = models.ForeignKey(
+        "core.User", on_delete=models.CASCADE, related_name="uploaded_videos"
+    )
+    users_watched_video = models.ManyToManyField(
+        to="core.User", related_name="watched_videos", through="video.WatchesHistory"
+    )
+    watches_count = models.PositiveIntegerField(default=0)
+    users_liked_video = models.ManyToManyField(
+        to="core.User", related_name="liked_videos", through="video.LikesHistory"
+    )
+    likes_count = models.PositiveIntegerField(default=0)
+    dislikes_count = models.PositiveIntegerField(default=0)
+
+
+class WatchesHistory(models.Model):
+    user = models.ForeignKey("core.User", on_delete=models.CASCADE)
+    video = models.ForeignKey("video.Video", on_delete=models.CASCADE)
+    watched_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (
+            "user",
+            "video",
+        )
+
+
+class LikesHistory(models.Model):
+    user = models.ForeignKey("core.User", on_delete=models.CASCADE)
+    video = models.ForeignKey("video.Video", on_delete=models.CASCADE)
+    liked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = (
+            "user",
+            "video",
+        )
