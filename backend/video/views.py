@@ -1,7 +1,7 @@
 from django.db import IntegrityError
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -102,3 +102,27 @@ class VideoViewSet(
 
         video.save()
         return Response({"success": response_message})
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="my/watched",
+        permission_classes=[IsAuthenticated],
+    )
+    def watched_by_user(self, request):
+        serializer = self.get_serializer(
+            instance=request.user.watched_videos.all(), many=True
+        )
+        return Response(serializer.data)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="my/liked",
+        permission_classes=[IsAuthenticated],
+    )
+    def liked_by_user(self, request):
+        serializer = self.get_serializer(
+            instance=request.user.liked_videos.all(), many=True
+        )
+        return Response(serializer.data)
