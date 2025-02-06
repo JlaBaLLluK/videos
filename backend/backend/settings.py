@@ -149,6 +149,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
+    "TOKEN_OBTAIN_SERIALIZER": "core.serializers.TokenObtainPairSerializer",
+    "UPDATE_LAST_LOGIN": True,
 }
 
 AUTH_USER_MODEL = "core.User"

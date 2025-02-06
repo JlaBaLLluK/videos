@@ -1,11 +1,44 @@
+from typing import Dict, Any
+
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+from rest_framework_simplejwt import serializers as jwt_serializer
 
 from core import models as core_models
+
+
+User = get_user_model()
 
 
 class PasswordField(serializers.CharField):
     def __init__(self):
         super().__init__(max_length=128, required=True, write_only=True)
+
+
+class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
+    username_or_email = serializers.CharField(write_only=True, required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop("username")
+
+    def validate_username_or_email(self, value):
+        if "@" in value:
+            try:
+                user = User.objects.get(email=value)
+            except ObjectDoesNotExist:
+                raise serializers.ValidationError("User with this email doesn't exist")
+
+            value = user.get_username()
+        else:
+            value = value
+
+        return value
+
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
+        attrs["username"] = self.validate_username_or_email(attrs["username_or_email"])
+        return super().validate(attrs)
 
 
 class BaseUserSerializer(serializers.ModelSerializer):

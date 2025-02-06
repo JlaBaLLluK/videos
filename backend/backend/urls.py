@@ -9,7 +9,7 @@ api_v1_urls = [
         "auth/",
         include(
             [
-                path("login/", jwt_views.token_obtain_pair),
+                path("login/", jwt_views.TokenObtainPairView.as_view()),
                 path("logout/", jwt_views.token_blacklist),
                 path("refresh-token/", jwt_views.token_refresh),
                 path("verify-token/", jwt_views.token_verify),
