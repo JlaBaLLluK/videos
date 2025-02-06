@@ -27,28 +27,29 @@ class Video(core_mixins.CreatedUpdatedMixin):
         to="core.User", related_name="liked_videos", through="video.LikesHistory"
     )
     likes_count = models.PositiveIntegerField(default=0)
+    users_disliked_video = models.ManyToManyField(
+        to="core.User", related_name="disliked_videos", through="video.DislikesHistory"
+    )
     dislikes_count = models.PositiveIntegerField(default=0)
 
 
-class WatchesHistory(models.Model):
+class AbstractUserVideoModel(models.Model):
     user = models.ForeignKey("core.User", on_delete=models.CASCADE)
     video = models.ForeignKey("video.Video", on_delete=models.CASCADE)
-    watched_at = models.DateTimeField(auto_now_add=True)
+    made_action_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = (
-            "user",
-            "video",
-        )
+        unique_together = ("user", "video")
+        abstract = True
 
 
-class LikesHistory(models.Model):
-    user = models.ForeignKey("core.User", on_delete=models.CASCADE)
-    video = models.ForeignKey("video.Video", on_delete=models.CASCADE)
-    liked_at = models.DateTimeField(auto_now_add=True)
+class WatchesHistory(AbstractUserVideoModel):
+    pass
 
-    class Meta:
-        unique_together = (
-            "user",
-            "video",
-        )
+
+class LikesHistory(AbstractUserVideoModel):
+    pass
+
+
+class DislikesHistory(AbstractUserVideoModel):
+    pass

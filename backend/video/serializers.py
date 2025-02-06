@@ -22,10 +22,10 @@ class VideoSerializer(serializers.ModelSerializer):
 class WatchesHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = video_models.WatchesHistory
-        fields = "__all__"
+        fields = ("user", "video")
 
 
 class LikesHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = video_models.LikesHistory
-        fields = "__all__"
+        fields = ("user", "video")

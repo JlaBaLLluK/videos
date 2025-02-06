@@ -1,5 +1,6 @@
+from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -40,11 +41,7 @@ class VideoViewSet(
             request.user.is_authenticated
             and request.user not in video.users_watched_video.all()
         ):
-            watches_history = video_serializers.WatchesHistorySerializer(
-                data={"video": video.id, "user": request.user.id}
-            )
-            watches_history.is_valid(raise_exception=True)
-            watches_history.save()
+            video.users_watched_video.add(request.user)
             video.watches_count += 1
             video.save()
 
@@ -52,33 +49,56 @@ class VideoViewSet(
 
     @extend_schema(
         description="Like video by user",
-        parameters=[
-            OpenApiParameter(
-                name="id",
-                description="A unique integer value identifying this video.",
-                location=OpenApiParameter.PATH,
-                required=True,
-                type=int,
-            )
-        ],
     )
     @action(
         methods=["POST"],
         detail=True,
-        serializer_class=video_serializers.LikesHistorySerializer,
         permission_classes=[IsAuthenticatedOrReadOnly],
     )
     def like(self, request, pk):
         video = self.get_object()
-        serializer = self.get_serializer(data={"video": pk, "user": request.user.id})
         try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            video_models.LikesHistory.objects.create(
+                video=video, user=request.user
+            )  # add doesn't throw an exception
+            response_message = "Set like"
             video.likes_count += 1
-            video.users_liked_video.add(request.user)
-        except serializers.ValidationError:
-            video.likes_count -= 1
+            if request.user in video.users_disliked_video.all():
+                video.dislikes_count -= 1
+                video.users_disliked_video.remove(request.user)
+
+        except IntegrityError:
             video.users_liked_video.remove(request.user)
+            response_message = "Removed like"
+            video.likes_count -= 1
 
         video.save()
-        return Response(data=serializer.data)
+        return Response({"success": response_message})
+
+    @extend_schema(
+        description="Dislike video by user",
+    )
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAuthenticatedOrReadOnly],
+    )
+    def dislike(self, request, pk):
+        video = self.get_object()
+        try:
+            video_models.DislikesHistory.objects.create(
+                video=video, user=request.user
+            )  # add doesn't throw an exception
+            response_message = "Set dislike"
+            video.dislikes_count += 1
+            if request.user in video.users_liked_video.all():
+                video.likes_count -= 1
+                video.users_liked_video.remove(request.user)
+
+        except IntegrityError:
+            video.users_disliked_video.remove(request.user)
+            response_message = "Removed dislike"
+            video.dislikes_count -= 1
+
+        video.save()
+        return Response({"success": response_message})
