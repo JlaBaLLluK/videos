@@ -6,14 +6,10 @@ from rest_framework import serializers
 from rest_framework_simplejwt import serializers as jwt_serializer
 
 from core import models as core_models
+from core import serializers_fields
 
 
 User = get_user_model()
-
-
-class PasswordField(serializers.CharField):
-    def __init__(self):
-        super().__init__(max_length=128, required=True, write_only=True)
 
 
 class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
@@ -52,9 +48,16 @@ class BaseUserSerializer(serializers.ModelSerializer):
             "profile_photo",
         )
 
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        if "profile_photo" not in data:
+            data["profile_photo"] = ""
+
+        return data
+
 
 class UserSerializer(BaseUserSerializer):
-    password = PasswordField()
+    password = serializers_fields.PasswordField()
 
     class Meta(BaseUserSerializer.Meta):
         fields = BaseUserSerializer.Meta.fields + ("password",)
@@ -72,9 +75,9 @@ class UserDetailSerializer(BaseUserSerializer):
 
 
 class UpdatePasswordSerializer(serializers.Serializer):
-    current_password = PasswordField()
-    new_password = PasswordField()
-    new_password_confirm = PasswordField()
+    current_password = serializers_fields.PasswordField()
+    new_password = serializers_fields.PasswordField()
+    new_password_confirm = serializers_fields.PasswordField()
 
     def validate_current_password(self, value):
         if not self.context["request"].user.check_password(value):

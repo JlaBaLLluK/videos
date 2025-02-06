@@ -4,15 +4,11 @@ from core import mixins as core_mixins
 
 
 def video_upload_to(instance, filename):
-    return (
-        f"videos/{instance.created_by.id}/{instance.id}/video.{filename.split(".")[-1]}"
-    )
+    return f"{instance.author.id}/VIDEO_{instance.id}/video.{filename.split(".")[-1]}"
 
 
 def video_preview_upload_to(instance, filename):
-    return (
-        f"videos/{instance.created_by}/{instance.id}/preview.{filename.split(".")[-1]}"
-    )
+    return f"{instance.author.id}/VIDEO_{instance.id}/preview.{filename.split(".")[-1]}"
 
 
 class Video(core_mixins.CreatedUpdatedMixin):

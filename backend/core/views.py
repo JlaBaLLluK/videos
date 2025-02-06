@@ -1,14 +1,13 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 
 from core import models as core_models
 from core import serializers as core_serializers
 from core import permissions as core_permissions
+from core import mixins as core_mixins
 
 
 @extend_schema_view(
@@ -20,13 +19,14 @@ from core import permissions as core_permissions
     destroy=extend_schema(description="User delete"),
 )
 @extend_schema(tags=["User"])
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet):
     queryset = core_models.User.objects.filter()
     serializer_class = core_serializers.UserSerializer
     permission_classes = [
         core_permissions.IsUserItself,
-        IsAuthenticated,
+        IsAuthenticatedOrReadOnly,
     ]
+    file_fields_and_functions = {"profile_photo": core_models.profile_photo_upload_to}
 
     def get_permissions(self):
         if self.action == "create":
@@ -39,6 +39,11 @@ class UserViewSet(viewsets.ModelViewSet):
             self.serializer_class = core_serializers.UserDetailSerializer
 
         return super().get_serializer_class()
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        instance.profile_photo.delete(save=False)
+        super().perform_update(serializer)
 
     @extend_schema(
         description="Update user password",
@@ -56,27 +61,13 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=["PATCH"],
         detail=True,
-        url_path="change-password",
+        url_path="update-password",
         serializer_class=core_serializers.UpdatePasswordSerializer,
     )
-    def change_password(self, request, pk=None):
+    def update_password(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.get_object()
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         return Response({"success": "Password updated successfully"})
-
-    def perform_create(self, serializer):
-        instance = serializer.save(profile_photo="")
-        profile_photo = serializer.validated_data["profile_photo"]
-        photo_content = ContentFile(profile_photo.read())
-        photo_path = core_models.profile_photo_upload_to(instance, profile_photo.name)
-        instance.profile_photo = photo_path
-        instance.save()
-        default_storage.save(photo_path, photo_content)
-
-    def perform_update(self, serializer):
-        instance = self.get_object()
-        instance.profile_photo.delete(save=False)
-        super().perform_update(serializer)
