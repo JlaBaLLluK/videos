@@ -103,6 +103,9 @@ class VideoViewSet(
         video.save()
         return Response({"success": response_message})
 
+    @extend_schema(
+        description="List of disliked by user videos",
+    )
     @action(
         methods=["GET"],
         detail=False,
@@ -115,6 +118,9 @@ class VideoViewSet(
         )
         return Response(serializer.data)
 
+    @extend_schema(
+        description="List of liked by user videos",
+    )
     @action(
         methods=["GET"],
         detail=False,
@@ -127,6 +133,9 @@ class VideoViewSet(
         )
         return Response(serializer.data)
 
+    @extend_schema(
+        description="List of uploaded by user videos",
+    )
     @action(
         methods=["GET"],
         detail=False,
