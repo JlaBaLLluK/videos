@@ -126,3 +126,15 @@ class VideoViewSet(
             instance=request.user.liked_videos.all(), many=True
         )
         return Response(serializer.data)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="my/videos",
+        permission_classes=[IsAuthenticated],
+    )
+    def user_videos(self, request):
+        serializer = self.get_serializer(
+            instance=request.user.uploaded_videos.all(), many=True
+        )
+        return Response(serializer.data)
