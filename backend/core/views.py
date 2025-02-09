@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from core import models as core_models
 from core import serializers as core_serializers
@@ -47,16 +47,6 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
 
     @extend_schema(
         description="Update user password",
-        parameters=[
-            OpenApiParameter(
-                name="id",
-                description="A unique integer value identifying this user.",
-                location=OpenApiParameter.PATH,
-                required=True,
-                type=int,
-            )
-        ],
-        request=core_serializers.UpdatePasswordSerializer,
     )
     @action(
         methods=["PATCH"],
