@@ -1,5 +1,4 @@
 import baseAPI from "@/api/api.js";
-import {useRouter} from "vue-router";
 
 export async function refreshToken() {
     try {
@@ -25,9 +24,10 @@ export function userRegister(credentials) {
 export async function userLogin(credentials) {
     try {
         const response = await baseAPI.post("auth/login/", credentials)
-        const {access, refresh} = response.data
+        const {access, refresh, username} = response.data
         localStorage.setItem("accessToken", access)
         localStorage.setItem("refreshToken", refresh)
+        localStorage.setItem("username", username)
         baseAPI.defaults.headers["Authorization"] = `Bearer ${access}`
     } catch (error) {
         console.error(error)
@@ -39,6 +39,7 @@ export async function userLogout() {
         const response = await baseAPI.post("auth/logout/", localStorage.getItem("refreshToken"))
         localStorage.removeItem("accessToken")
         localStorage.removeItem("refreshToken")
+        localStorage.removeItem("username")
         baseAPI.defaults.headers["Authorization"] = ""
     } catch (error) {
         console.error(error)
