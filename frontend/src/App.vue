@@ -1,7 +1,21 @@
 <script setup>
-import {computed} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
+import {userLogout} from "@/api/index.js";
 
-const isAuthenticated = computed(() => localStorage.getItem('refreshToken'))
+let isAuthenticated = ref(!!localStorage.getItem('refreshToken'))
+
+function isAuthenticatedUpdate() {
+  isAuthenticated.value = !!localStorage.getItem('refreshToken')
+}
+
+onMounted(() => {
+  window.addEventListener("auth-changed", isAuthenticatedUpdate)
+})
+
+onUnmounted(() => {
+  window.addEventListener("auth-changed", isAuthenticatedUpdate)
+})
+
 </script>
 
 <template>
@@ -19,7 +33,7 @@ const isAuthenticated = computed(() => localStorage.getItem('refreshToken'))
             <div>Профиль</div>
           </router-link>
           <router-link to="/">
-            <div>Выйти</div>
+            <div @click="userLogout">Выйти</div>
           </router-link>
         </div>
         <div class="header-right" v-else>
@@ -33,7 +47,6 @@ const isAuthenticated = computed(() => localStorage.getItem('refreshToken'))
 
       </div>
     </header>
-
     <router-view/>
   </div>
 

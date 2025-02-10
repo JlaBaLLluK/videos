@@ -14,7 +14,6 @@ User = get_user_model()
 
 class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
     username_or_email = serializers.CharField(write_only=True, required=True)
-    username = serializers.CharField(read_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,13 +30,13 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
         else:
             value = value
 
-        self.username = value
         return value
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
-        attrs["username"] = self.validate_username_or_email(attrs["username_or_email"])
+        username = self.validate_username_or_email(attrs["username_or_email"])
+        attrs["username"] = username
         data = super().validate(attrs)
-        data["username"] = self.username
+        data["username"] = username
         return data
 
 
