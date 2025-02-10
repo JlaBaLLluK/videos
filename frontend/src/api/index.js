@@ -12,14 +12,18 @@ export async function refreshToken() {
     }
 }
 
-export function userRegister(credentials) {
-    baseAPI.post("core/user/", credentials)
-        .then(response => {
-
+export async function userRegister(credentials) {
+    try {
+        const response = await baseAPI.post("core/users/", credentials, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
         })
-        .catch(error => {
-
-        })
+        return true
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
 
 export async function userLogin(credentials) {

@@ -17,17 +17,20 @@ function onLoginClick() {
         if (success) {
           router.push("/")
         }
-  })
+      })
 }
 </script>
 
 <template>
   <h1>Login</h1>
-  <label for="username_input">Username or email</label><input v-model="usernameOrEmail" id="username_input" type="text"
-                                                              placeholder="username or email"><br>
-  <label for="password_input">Password</label><input v-model="password" id="password_input" type="password"
-                                                     placeholder="password"><br>
-  <button type="submit" @click="onLoginClick" href="/">Login</button>
+  <form @submit.prevent>
+    <label for="username_input">Username or email</label><input v-model="usernameOrEmail" id="username_input"
+                                                                type="text"
+                                                                placeholder="username or email"><br>
+    <label for="password_input">Password</label><input v-model="password" id="password_input" type="password"
+                                                       placeholder="password"><br>
+    <button type="submit" @click="onLoginClick">Login</button>
+  </form>
 </template>
 
 <style scoped>

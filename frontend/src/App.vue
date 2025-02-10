@@ -3,9 +3,11 @@ import {onMounted, onUnmounted, ref} from "vue";
 import {userLogout} from "@/api/index.js";
 
 let isAuthenticated = ref(!!localStorage.getItem('refreshToken'))
+const username = ref(localStorage.getItem("username"))
 
 function isAuthenticatedUpdate() {
   isAuthenticated.value = !!localStorage.getItem('refreshToken')
+  username.value = localStorage.getItem("username")
 }
 
 onMounted(() => {
@@ -20,32 +22,32 @@ onUnmounted(() => {
 
 <template>
   <div class="site-container">
-    <header class="header">
-      <div class="header-content h-100 d-flex justify-content-between align-items-center">
-        <router-link to="/">
-          <div class="header-left">
-            <div>Видео-Платформа</div>
-          </div>
-        </router-link>
-
-        <div class="header-right" v-if="isAuthenticated">
+    <header>
+      <nav class="navbar">
+        <div class="header-left">
           <router-link to="/">
-            <div>Профиль</div>
-          </router-link>
-          <router-link to="/">
-            <div @click="userLogout">Выйти</div>
+            Видео-Платформа
           </router-link>
         </div>
-        <div class="header-right" v-else>
-          <router-link to="/register">
-            <div>Регистрация</div>
-          </router-link>
-          <router-link to="/login">
-            <div>Вход</div>
-          </router-link>
+        <div class="header-right d-flex gap-4">
+          <template v-if="isAuthenticated">
+            <router-link :to="{name: 'profile', params: {'username': username}}">
+              Профиль
+            </router-link>
+            <router-link to="/logout" @click="userLogout">
+              Выход
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link to="/login">
+              Вход
+            </router-link>
+            <router-link to="/registration">
+              Регистрация
+            </router-link>
+          </template>
         </div>
-
-      </div>
+      </nav>
     </header>
     <router-view/>
   </div>
@@ -64,24 +66,22 @@ body {
 
 <style scoped>
 
-.header {
+header {
   background-color: bisque;
   height: 50px;
   font-size: 20px;
 }
 
-.header a {
+header a {
   text-decoration: none;
 }
 
 .header-left {
-  padding-left: 15px;
+  padding-left: 30px;
 }
 
 .header-right {
-  display: flex;
-  gap: 25px;
-  padding-right: 10px;
+  padding-right: 30px;
 }
 
 .footer {

@@ -57,6 +57,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     def update_password(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # TODO: may be move to serializer
         user = self.get_object()
         user.set_password(serializer.validated_data["new_password"])
         user.save()
