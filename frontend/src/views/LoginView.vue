@@ -1,38 +1,55 @@
 <script setup>
-import {userLogin} from "@/api/index.js";
+import BaseAuthView from "@/views/base/BaseAuthView.vue";
 import {ref} from "vue";
-import {useRouter} from "vue-router";
 
-const usernameOrEmail = ref()
-const password = ref()
-const router = useRouter()
+const form = ref({
+  username_or_email: "",
+  password: "",
+})
 
-function onLoginClick() {
-  const credentials = {
-    "username_or_email": usernameOrEmail.value,
-    "password": password.value
-  }
-  userLogin(credentials)
-      .then((success) => {
-        if (success) {
-          router.push("/")
-        }
-      })
-}
+const passwordShown = ref(false);
+
 </script>
 
 <template>
-  <h1>Login</h1>
-  <form @submit.prevent>
-    <label for="username_input">Username or email</label><input v-model="usernameOrEmail" id="username_input"
-                                                                type="text"
-                                                                placeholder="username or email"><br>
-    <label for="password_input">Password</label><input v-model="password" id="password_input" type="password"
-                                                       placeholder="password"><br>
-    <button type="submit" @click="onLoginClick">Login</button>
-  </form>
+  <BaseAuthView>
+    <v-form enctype="multipart/form-data">
+      <v-text-field
+          v-model="form.username_or_email"
+          variant="outlined"
+          density="compact"
+          id="username"
+          label="Имя пользователя или эл. почта"
+          placeholder="Введите имя пользователя или эл. почту"/>
+      <v-text-field
+          v-model="form.password"
+          variant="outlined"
+          density="compact"
+          id="password"
+          label="Пароль"
+          placeholder="Введите пароль"
+          :type="passwordShown ? 'text' : 'password'"
+          :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="passwordShown = !passwordShown"/>
+      <div class="w-100 text-center">
+        <v-btn variant="outlined">Войти</v-btn>
+      </div>
+    </v-form>
+  </BaseAuthView>
 </template>
 
 <style scoped>
+:deep(form) {
+  min-width: 400px;
+}
+
+:deep(.v-label) {
+  font-size: 18px;
+}
+
+button {
+  width: 400px;
+  min-height: 45px;
+}
 
 </style>

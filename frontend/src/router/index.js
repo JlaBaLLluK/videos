@@ -1,29 +1,25 @@
-import HomeView from "@/views/HomeView.vue";
-import RegisterView from "@/views/RegisterView.vue";
-import LoginView from "@/views/LoginView.vue";
-import ProfileView from "@/views/ProfileView.vue";
 import {createRouter, createWebHistory} from "vue-router";
 
 const routes = [
     {
         path: "/",
         name: "home",
-        component: HomeView,
+        component: () => import("@/views/HomeView.vue"),
     },
     {
         path: "/registration",
         name: "registration",
-        component: RegisterView,
+        component: () => import("@/views/RegistrationView.vue"),
     },
     {
         path: "/login",
         name: "login",
-        component: LoginView,
+        component: () => import("@/views/LoginView.vue"),
     },
     {
         path: "/:username",
         name: "profile",
-        component: ProfileView,
+        component: () => import("@/views/ProfileView.vue"),
 
     },
     {

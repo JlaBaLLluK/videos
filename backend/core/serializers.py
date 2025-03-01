@@ -48,7 +48,6 @@ class BaseUserSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
-            "profile_photo",
         )
 
     def to_internal_value(self, data):

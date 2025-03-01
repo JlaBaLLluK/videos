@@ -1,60 +1,38 @@
 <script setup>
-import {onMounted, onUnmounted, ref} from "vue";
-import {userLogout} from "@/api/index.js";
+import {computed, ref} from "vue";
+import {useRoute} from "vue-router";
 
-let isAuthenticated = ref(!!localStorage.getItem('refreshToken'))
-const username = ref(localStorage.getItem("username"))
+const route = useRoute()
 
-function isAuthenticatedUpdate() {
-  isAuthenticated.value = !!localStorage.getItem('refreshToken')
-  username.value = localStorage.getItem("username")
-}
-
-onMounted(() => {
-  window.addEventListener("auth-changed", isAuthenticatedUpdate)
-})
-
-onUnmounted(() => {
-  window.addEventListener("auth-changed", isAuthenticatedUpdate)
-})
-
+let isAuthenticated = ref(!!localStorage.getItem('refreshToken'));
+const username = ref(localStorage.getItem("username"));
+const routeName = computed(() => isAuthenticated.value ? "profile" : "registration");
+const showSidebar = computed(() => !["registration", "login"].includes(route.name));
 </script>
 
 <template>
-  <div class="site-container">
-    <header>
+  <div class="site-container d-flex vh-100">
+    <header class="w-100" style="position: fixed">
       <nav class="navbar">
-        <div class="header-left">
+        <div class="px-4">
           <router-link to="/">
             Видео-Платформа
           </router-link>
         </div>
-        <div class="header-right d-flex gap-4">
-          <template v-if="isAuthenticated">
-            <router-link :to="{name: 'profile', params: {'username': username}}">
-              Профиль
-            </router-link>
-            <router-link to="/logout" @click="userLogout">
-              Выход
-            </router-link>
-          </template>
-          <template v-else>
-            <router-link to="/login">
-              Вход
-            </router-link>
-            <router-link to="/registration">
-              Регистрация
-            </router-link>
-          </template>
+        <div class="px-4">
+          <router-link :to="{name: routeName, params: {username: username}}">Профиль</router-link>
         </div>
       </nav>
     </header>
-    <router-view/>
+        <aside v-if="showSidebar" class="sidebar d-flex flex-column p-3" style="margin-top: 50px; background-color: aqua">
+      <router-link to="/history">История</router-link>
+      <router-link to="/videos">Ваши видео</router-link>
+      <router-link to="/liked">Понравившиеся</router-link>
+    </aside>
+    <div class="d-flex justify-center w-100">
+      <router-view/>
+    </div>
   </div>
-
-  <footer class="footer text-center">
-    Footer
-  </footer>
 </template>
 
 <style>
@@ -69,24 +47,11 @@ body {
 header {
   background-color: bisque;
   height: 50px;
-  font-size: 20px;
 }
 
 header a {
   text-decoration: none;
+  font-size: 22px;
 }
-
-.header-left {
-  padding-left: 30px;
-}
-
-.header-right {
-  padding-right: 30px;
-}
-
-.footer {
-  background-color: lightgray;
-}
-
 </style>
 
