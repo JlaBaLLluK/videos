@@ -2,12 +2,11 @@ from typing import Dict, Any
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from rest_framework_simplejwt import serializers as jwt_serializer
 
 from core import models as core_models
 from core import serializers_fields
-
 
 User = get_user_model()
 
@@ -41,6 +40,15 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        validators=[
+            validators.UniqueValidator(
+                queryset=core_models.User.objects.all(),
+                message="Пользователь с такой почтой уже существует."
+            )
+        ]
+    )
+
     class Meta:
         model = core_models.User
         fields = (
@@ -52,9 +60,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
-        if "profile_photo" not in data:
-            data["profile_photo"] = ""
-
+        data["profile_photo"] = ""
         return data
 
 

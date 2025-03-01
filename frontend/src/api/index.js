@@ -12,17 +12,22 @@ export async function refreshToken() {
     }
 }
 
-export async function userRegister(credentials) {
+export async function userRegistration(credentials) {
     try {
         const response = await baseAPI.post("core/users/", credentials, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         });
-        return true;
+        return {
+            data: response.data,
+            status: response.status
+        }
     } catch (error) {
-        console.error(error);
-        return false;
+        return {
+            data: error.response.data,
+            status: error.response.status
+        };
     }
 }
 
@@ -33,10 +38,15 @@ export async function userLogin(credentials) {
         localStorage.setItem("refreshToken", refresh);
         localStorage.setItem("username", username);
         baseAPI.defaults.headers["Authorization"] = `Bearer ${access}`;
-        return true;
+        return {
+            data: response.data,
+            status: response.status
+        }
     } catch (error) {
-        console.error(error);
-        return false;
+        return {
+            data: error.response.data,
+            status: error.response.status
+        };
     }
 }
 

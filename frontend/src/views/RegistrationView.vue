@@ -1,38 +1,61 @@
 <script setup>
 import BaseAuthView from "@/views/base/BaseAuthView.vue";
 import {ref} from "vue";
+import {userRegistration} from "@/api/index.js";
+import {useRouter} from "vue-router";
 
 const form = ref({
   username: "",
   email: "",
   password: "",
   password_confirm: ""
-})
-
+});
+const formErrors = ref({});
 const passwordShown = ref(false);
 const confirmPasswordShow = ref(false);
+
+const router = useRouter()
+
+async function submit() {
+  if (form.value.password !== form.value.password_confirm) {
+    formErrors.value.password_confirm = "Пароли не совпадают.";
+    return;
+  }
+
+  const response = await userRegistration(form.value);
+  if (response.status === 400) {
+    console.log(response);
+    formErrors.value = response.data;
+  } else {
+    await router.push({name: 'hone'});
+  }
+}
 
 </script>
 
 <template>
   <BaseAuthView>
-    <v-form v-model="form">
+    <v-form class="mt-6" @submit.prevent="submit">
       <v-text-field
           v-model="form.username"
           variant="outlined"
           density="compact"
           id="username"
           label="Имя пользователя"
-          placeholder="Введите имя пользователя"/>
+          placeholder="Введите имя пользователя"
+          :error-messages="formErrors.username"/>
       <v-text-field
+          class="mt-3"
           v-model="form.email"
           variant="outlined"
           density="compact"
           id="email"
           type="email"
           label="Электронная почта"
-          placeholder="Введите электронную почту"/>
+          placeholder="Введите электронную почту"
+          :error-messages="formErrors.email"/>
       <v-text-field
+          class="mt-3"
           v-model="form.password"
           variant="outlined"
           density="compact"
@@ -41,8 +64,10 @@ const confirmPasswordShow = ref(false);
           placeholder="Введите пароль"
           :type="passwordShown ? 'text' : 'password'"
           :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="passwordShown = !passwordShown"/>
+          @click:append-inner="passwordShown = !passwordShown"
+          :error-messages="formErrors.password"/>
       <v-text-field
+          class="mt-3"
           v-model="form.password_confirm"
           variant="outlined"
           density="compact" id="password_confirm"
@@ -50,9 +75,10 @@ const confirmPasswordShow = ref(false);
           placeholder="Введите пароль повторно"
           :type="confirmPasswordShow ? 'text' : 'password'"
           :append-inner-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="confirmPasswordShow = !confirmPasswordShow"/>
-      <div class="w-100 text-center">
-        <v-btn variant="outlined">Зарегистрироваться</v-btn>
+          @click:append-inner="confirmPasswordShow = !confirmPasswordShow"
+          :error-messages="formErrors.password_confirm"/>
+      <div class="w-100 text-center mt-3">
+        <v-btn variant="outlined" type="submit">Зарегистрироваться</v-btn>
       </div>
     </v-form>
   </BaseAuthView>
@@ -65,6 +91,10 @@ const confirmPasswordShow = ref(false);
 
 :deep(.v-label) {
   font-size: 18px;
+}
+
+:deep(.v-messages__message) {
+  font-size: 16px;
 }
 
 button {

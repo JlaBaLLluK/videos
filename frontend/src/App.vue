@@ -24,7 +24,7 @@ const showSidebar = computed(() => !["registration", "login"].includes(route.nam
         </div>
       </nav>
     </header>
-        <aside v-if="showSidebar" class="sidebar d-flex flex-column p-3" style="margin-top: 50px; background-color: aqua">
+    <aside v-if="showSidebar" class="sidebar d-flex flex-column p-3" style="margin-top: 50px; background-color: aqua">
       <router-link to="/history">История</router-link>
       <router-link to="/videos">Ваши видео</router-link>
       <router-link to="/liked">Понравившиеся</router-link>
