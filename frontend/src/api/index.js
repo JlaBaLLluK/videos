@@ -38,6 +38,7 @@ export async function userLogin(credentials) {
         localStorage.setItem("refreshToken", refresh);
         localStorage.setItem("username", username);
         baseAPI.defaults.headers["Authorization"] = `Bearer ${access}`;
+        window.dispatchEvent(new Event("user-login"));
         return {
             data: response.data,
             status: response.status
@@ -59,8 +60,7 @@ export async function userLogout() {
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("username");
         baseAPI.defaults.headers["Authorization"] = "";
-        window.dispatchEvent(new Event("auth-changed"));
-        return true;
+        window.dispatchEvent(new Event("user-logout"));
     } catch (error) {
         console.error(error);
         return false;

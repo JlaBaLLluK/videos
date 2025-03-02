@@ -22,11 +22,6 @@ const routes = [
         component: () => import("@/views/ProfileView.vue"),
 
     },
-    {
-        path: "/logout",
-        name: "logout",
-        redirect: "/"
-    }
 ]
 
 const router = createRouter({

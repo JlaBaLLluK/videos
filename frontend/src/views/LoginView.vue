@@ -15,7 +15,6 @@ const router = useRouter()
 
 async function submit() {
   const response = await userLogin(form.value);
-  console.log(response);
   if (response.status === 400) {
     formErrors.value = response.data;
   } else if (response.status === 401) {
