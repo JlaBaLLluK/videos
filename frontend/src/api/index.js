@@ -56,13 +56,27 @@ export async function userLogout() {
         const data = {
             "refresh": localStorage.getItem("refreshToken")
         };
-        const response = await baseAPI.post("auth/logout/", data);
+        await baseAPI.post("auth/logout/", data);
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("username");
         baseAPI.defaults.headers["Authorization"] = "";
         window.dispatchEvent(new Event("user-logout"));
     } catch (error) {
         console.error(error);
-        return false;
+    }
+}
+
+export async function getUserData(username) {
+    try {
+        const response = await baseAPI.get(`core/users/${username}/`);
+        return {
+            data: response.data,
+            status: response.status
+        }
+    } catch (error) {
+        return {
+            data: error.response.data,
+            status: error.response.status
+        };
     }
 }
