@@ -55,7 +55,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         url_path="update-password",
         serializer_class=core_serializers.UpdatePasswordSerializer,
     )
-    def update_password(self, request, pk=None):
+    def update_password(self, request, username=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

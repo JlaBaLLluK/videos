@@ -27,7 +27,7 @@ class VideoViewSet(
     serializer_class = video_serializers.VideoSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
-        core_permissions.IsObjectOwner,
+        core_permissions.IsObjectOwnerOrReadonly,
     ]
     file_fields_and_functions = {
         "video": video_models.video_upload_to,
@@ -60,7 +60,7 @@ class VideoViewSet(
         try:
             video_models.LikesHistory.objects.create(
                 video=video, user=request.user
-            )  # add doesn't throw an exception
+            )  # 'add' method doesn't throw an exception
             response_message = "Set like"
             video.likes_count += 1
             if request.user in video.users_disliked_video.all():
@@ -88,7 +88,7 @@ class VideoViewSet(
         try:
             video_models.DislikesHistory.objects.create(
                 video=video, user=request.user
-            )  # add doesn't throw an exception
+            )  # 'add' method doesn't throw an exception
             response_message = "Set dislike"
             video.dislikes_count += 1
             if request.user in video.users_liked_video.all():
