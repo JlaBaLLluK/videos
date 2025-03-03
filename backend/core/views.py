@@ -27,6 +27,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         IsAuthenticatedOrReadOnly,
     ]
     file_fields_and_functions = {"profile_photo": core_models.profile_photo_upload_to}
+    lookup_field = "username"
 
     def get_permissions(self):
         if self.action == "create":
@@ -57,8 +58,5 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     def update_password(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # TODO: may be move to serializer
-        user = self.get_object()
-        user.set_password(serializer.validated_data["new_password"])
-        user.save()
+        serializer.save()
         return Response({"success": "Password updated successfully"})

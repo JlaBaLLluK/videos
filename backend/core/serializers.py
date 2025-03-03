@@ -44,7 +44,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         validators=[
             validators.UniqueValidator(
                 queryset=core_models.User.objects.all(),
-                message="Пользователь с такой почтой уже существует."
+                message="Пользователь с такой почтой уже существует.",
             )
         ]
     )
@@ -98,3 +98,9 @@ class UpdatePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Passwords aren't the same")
 
         return attrs
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        user.set_password(self.validated_data["new_password"])
+        user.save()
+        return user
