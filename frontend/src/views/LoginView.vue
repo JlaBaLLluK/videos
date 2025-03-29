@@ -15,22 +15,20 @@ const router = useRouter()
 
 async function submit() {
   const response = await userLogin(form.value);
-  if (response.status === 400) {
+  if (response.status >= 400) {
     formErrors.value = response.data;
-  } else if (response.status === 401) {
-    formErrors.value.wrongCredentials = "Учётная запись не найдена.";
   } else {
     await router.push({name: 'home'});
   }
 }
-
 </script>
 
 <template>
   <BaseAuthView>
-    <v-form :class="{'mt-2': formErrors.wrongCredentials, 'mt-6': !formErrors.wrongCredentials}" @submit.prevent="submit">
-      <label class="wrong-cred w-100 text-center mb-5"
-             v-if="formErrors.wrongCredentials">{{ formErrors.wrongCredentials }}</label>
+    <v-form :class="{'mt-2': formErrors.detail, 'mt-6': !formErrors.detail}"
+            @submit.prevent="submit">
+      <label class="wrong-cred fs-5 text-danger w-100 text-center mb-5"
+             v-if="formErrors.detail">{{ formErrors.detail }}</label>
       <v-text-field
           v-model="form.username_or_email"
           variant="outlined"
@@ -74,11 +72,6 @@ button {
 
 :deep(.v-messages__message) {
   font-size: 16px;
-}
-
-.wrong-cred {
-  font-size: 20px;
-  color: #b00020;
 }
 
 </style>

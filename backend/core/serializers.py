@@ -13,19 +13,21 @@ User = get_user_model()
 
 class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
     username_or_email = serializers.CharField(write_only=True, required=True)
+    default_error_messages = {"no_active_account": "Учетная запись не найдена."}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields.pop("username")
 
-    def validate_username_or_email(self, value):
+    @staticmethod
+    def validate_username_or_email(value):
         if "@" in value:
             try:
                 user = User.objects.get(email=value)
             except ObjectDoesNotExist:
-                raise serializers.ValidationError("User with this email doesn't exist")
-
-            value = user.get_username()
+                pass
+            else:
+                value = user.get_username()
         else:
             value = value
 
@@ -66,9 +68,20 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(BaseUserSerializer):
     password = serializers_fields.PasswordField()
+    password_confirm = serializers_fields.PasswordField()
 
     class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + ("password",)
+        fields = BaseUserSerializer.Meta.fields + ("password", "password_confirm")
+
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
+        password = attrs.get("password")
+        password_confirm = attrs.pop("password_confirm")
+        if password != password_confirm:
+            raise serializers.ValidationError(
+                {"password_confirm": "Пароли не совпадают"}
+            )
+
+        return super().validate(attrs)
 
     def create(self, validated_data):
         password = validated_data.pop("password")

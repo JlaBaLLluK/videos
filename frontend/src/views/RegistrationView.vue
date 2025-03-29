@@ -17,17 +17,11 @@ const confirmPasswordShow = ref(false);
 const router = useRouter()
 
 async function submit() {
-  if (form.value.password !== form.value.password_confirm) {
-    formErrors.value.password_confirm = "Пароли не совпадают.";
-    return;
-  }
-
   const response = await userRegistration(form.value);
   if (response.status === 400) {
-    console.log(response);
     formErrors.value = response.data;
   } else {
-    await router.push({name: 'hone'});
+    await router.push({name: 'login'});
   }
 }
 
@@ -40,7 +34,6 @@ async function submit() {
           v-model="form.username"
           variant="outlined"
           density="compact"
-          id="username"
           label="Имя пользователя"
           placeholder="Введите имя пользователя"
           :error-messages="formErrors.username"/>
@@ -49,7 +42,6 @@ async function submit() {
           v-model="form.email"
           variant="outlined"
           density="compact"
-          id="email"
           type="email"
           label="Электронная почта"
           placeholder="Введите электронную почту"
@@ -59,7 +51,6 @@ async function submit() {
           v-model="form.password"
           variant="outlined"
           density="compact"
-          id="password"
           label="Пароль"
           placeholder="Введите пароль"
           :type="passwordShown ? 'text' : 'password'"
@@ -70,7 +61,7 @@ async function submit() {
           class="mt-3"
           v-model="form.password_confirm"
           variant="outlined"
-          density="compact" id="password_confirm"
+          density="compact"
           label="Подтверждение пароля"
           placeholder="Введите пароль повторно"
           :type="confirmPasswordShow ? 'text' : 'password'"
