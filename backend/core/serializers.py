@@ -37,7 +37,6 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
         username = self.validate_username_or_email(attrs["username_or_email"])
         attrs["username"] = username
         data = super().validate(attrs)
-        data["username"] = username
         return data
 
 
@@ -102,13 +101,13 @@ class UpdatePasswordSerializer(serializers.Serializer):
 
     def validate_current_password(self, value):
         if not self.context["request"].user.check_password(value):
-            raise serializers.ValidationError("Current password is wrong")
+            raise serializers.ValidationError("Текущий пароль неверный.")
 
         return value
 
     def validate(self, attrs):
         if attrs["new_password"] != attrs["new_password_confirm"]:
-            raise serializers.ValidationError("Passwords aren't the same")
+            raise serializers.ValidationError("Пароли не совпадают.")
 
         return attrs
 

@@ -60,3 +60,9 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": "Password updated successfully"})
+
+    @extend_schema(description="Get authenticated user data")
+    @action(methods=["GET"], detail=False, serializer_class=core_serializers.UserDetailSerializer)
+    def me(self, request):
+        serializer = self.get_serializer(instance=request.user)
+        return Response(serializer.data)

@@ -7,18 +7,16 @@ const router = useRouter()
 const route = useRoute();
 
 const isAuthenticated = ref();
-const username = ref();
 const isMenuOpened = ref(false);
+const user = ref({});
 const showSidebar = computed(() => !["registration", "login"].includes(route.name));
 
 function userLoginEventHandler() {
   isAuthenticated.value = true;
-  username.value = localStorage.getItem("username");
 }
 
 function userLogoutEventHandler() {
   isAuthenticated.value = false;
-  username.value = null;
 }
 
 function toggleMenu() {
@@ -37,9 +35,8 @@ async function logout() {
 }
 
 onMounted(() => {
-  const storedUsername = localStorage.getItem("username");
-  isAuthenticated.value = !!storedUsername;
-  username.value = storedUsername || null;
+  user.value = JSON.parse(localStorage.getItem("user"));
+  isAuthenticated.value = !!user;
   window.addEventListener("user-login", userLoginEventHandler);
   window.addEventListener("user-logout", userLogoutEventHandler);
 });
@@ -68,7 +65,7 @@ onUnmounted(() => {
               </v-btn>
             </template>
             <v-list>
-              <v-list-item :to="{name: 'profile', params: {username: username}}">
+              <v-list-item :to="{name: 'profile', params: {username: user.username}}">
                 <v-list-item-title>Профиль</v-list-item-title>
               </v-list-item>
               <v-list-item @click="logout">

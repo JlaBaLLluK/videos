@@ -10,14 +10,8 @@ const username = route.params.username;
 const isChannelOwner = ref(false);
 
 onMounted(async () => {
-  const userData = await getUserData(username);
-  const storedUsername = localStorage.getItem("username");
-  if (storedUsername === username) {
-    isChannelOwner.value = true;
-
-  }
-  document.title = username.toString();
-  console.log(userData);
+  const user = JSON.parse(localStorage.getItem("user"));
+  document.title = user.username.toString();
 });
 
 onUnmounted(() => {
