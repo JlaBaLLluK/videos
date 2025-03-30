@@ -15,7 +15,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  document.title = "Videos";
+  document.title = "VidFlow";
 })
 </script>
 
