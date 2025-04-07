@@ -21,7 +21,7 @@ from core import mixins as core_mixins
 @extend_schema(tags=["User"])
 class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet):
     queryset = core_models.User.objects.filter()
-    serializer_class = core_serializers.UserSerializer
+    serializer_class = core_serializers.UserCreateSerializer
     permission_classes = [
         core_permissions.IsUserItself,
         IsAuthenticatedOrReadOnly,
@@ -36,7 +36,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action in ["update", "partial_update"]:
+        if self.action in ["update", "partial_update", "retrieve"]:
             self.serializer_class = core_serializers.UserDetailSerializer
 
         return super().get_serializer_class()
@@ -62,7 +62,11 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         return Response({"success": "Password updated successfully"})
 
     @extend_schema(description="Get authenticated user data")
-    @action(methods=["GET"], detail=False, serializer_class=core_serializers.UserDetailSerializer)
+    @action(
+        methods=["GET"],
+        detail=False,
+        serializer_class=core_serializers.UserDetailSerializer,
+    )
     def me(self, request):
         serializer = self.get_serializer(instance=request.user)
         return Response(serializer.data)

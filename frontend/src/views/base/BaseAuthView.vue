@@ -8,7 +8,7 @@ const isRegistrationActive = route.name === "registration";
 </script>
 
 <template>
-  <div class="d-flex justify-center align-center" style="height: 85%;">
+  <div class="d-flex justify-center align-center h-75">
     <div class="p-5 border rounded shadow bg-white">
       <div class="d-flex justify-center gap-3" style="cursor: pointer; font-size: 22px;">
         <div class="px-3" :class="{ active: !isRegistrationActive }" @click="router.push({ name: 'login' })">

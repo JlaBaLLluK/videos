@@ -120,7 +120,7 @@ onUnmounted(() => {
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <v-main>
+      <v-main class="">
         <router-view/>
       </v-main>
     </div>
@@ -129,11 +129,9 @@ onUnmounted(() => {
 
 <style scoped>
 header {
-  background-color: #dddddd;
+  background-color: #f1efef !important;
   height: 60px;
   position: fixed;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 2 !important;
 }
 
 header a {
@@ -143,10 +141,8 @@ header a {
 }
 
 :deep(.v-navigation-drawer) {
-  background-color: #FFFFFF;
   border: none;
   box-shadow: 4px 0 8px rgba(0, 0, 0, 0.15);
-  z-index: 1 !important;
 }
 
 :deep(.v-list-item-title) {
@@ -155,4 +151,3 @@ header a {
 
 
 </style>
-

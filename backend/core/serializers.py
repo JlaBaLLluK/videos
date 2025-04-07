@@ -2,6 +2,7 @@ from typing import Dict, Any
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import RegexValidator
 from rest_framework import serializers, validators
 from rest_framework_simplejwt import serializers as jwt_serializer
 
@@ -51,12 +52,21 @@ class BaseUserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = core_models.User
+        model = User
         fields = (
             "username",
             "email",
             "first_name",
             "last_name",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].validators.append(
+            RegexValidator(
+                regex=r"^[a-zA-Z][a-zA-Z0-9_]*$",
+                message="Имя пользователя может содержать буквы латинского алфавита, цифры и символ нижнего подчеркивания.",
+            )
         )
 
     def to_internal_value(self, data):
@@ -65,7 +75,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         return data
 
 
-class UserSerializer(BaseUserSerializer):
+class UserCreateSerializer(BaseUserSerializer):
     password = serializers_fields.PasswordField()
     password_confirm = serializers_fields.PasswordField()
 
@@ -91,7 +101,12 @@ class UserSerializer(BaseUserSerializer):
 
 
 class UserDetailSerializer(BaseUserSerializer):
-    pass
+    class Meta(BaseUserSerializer.Meta):
+        fields = BaseUserSerializer.Meta.fields + (
+            "profile_photo",
+            "created_at",
+            "channel_name",
+        )
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

@@ -1,5 +1,4 @@
 import baseAPI from "@/api/api.js";
-import {ca} from "vuetify/locale";
 
 
 export async function refreshToken() {
@@ -83,5 +82,21 @@ export async function getUserData(username) {
             data: error.response.data,
             status: error.response.status
         };
+    }
+}
+
+export async function updateUserData(username, data) {
+    try {
+        const response = await baseAPI.patch(`core/users/${username}/`, data);
+        await getMe();
+        return {
+            data: response.data,
+            status: response.status
+        }
+    } catch (error) {
+        return {
+            data: error.response.data,
+            status: error.response.status,
+        }
     }
 }
