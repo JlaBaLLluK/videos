@@ -1,9 +1,9 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {userLogout} from "@/api/index.js";
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {userLogout} from '@/api/index.js';
 
-const router = useRouter()
+const router = useRouter();
 const route = useRoute();
 
 const user = ref(JSON.parse(localStorage.getItem('user')));
@@ -11,8 +11,8 @@ const isAuthenticated = ref(!!user.value);
 const isMenuOpened = ref(false);
 const isSidebarCollapsed = ref(false);
 
-const showSidebar = computed(() => !["registration", "login"].includes(route.name));
-const collapseSidebarIcon = computed(() => isSidebarCollapsed.value ? "mdi-arrow-right" : "mdi-arrow-left")
+const showSidebar = computed(() => !['registration', 'login'].includes(route.name));
+const collapseSidebarIcon = computed(() => isSidebarCollapsed.value ? 'mdi-arrow-right' : 'mdi-arrow-left');
 
 function userLoginEventHandler() {
   user.value = JSON.parse(localStorage.getItem('user'));
@@ -39,13 +39,13 @@ async function logout() {
 }
 
 onMounted(() => {
-  window.addEventListener("user-login", userLoginEventHandler);
-  window.addEventListener("user-logout", userLogoutEventHandler);
+  window.addEventListener('user-login', userLoginEventHandler);
+  window.addEventListener('user-logout', userLogoutEventHandler);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("user-login", userLoginEventHandler);
-  window.removeEventListener("user-logout", userLogoutEventHandler);
+  window.removeEventListener('user-login', userLoginEventHandler);
+  window.removeEventListener('user-logout', userLogoutEventHandler);
 });
 
 </script>
@@ -66,7 +66,12 @@ onUnmounted(() => {
           <div class="pr-5">
             <v-menu v-model="isMenuOpened">
               <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" icon style="font-size: 24px;" @click="toggleMenu">
+                <v-btn
+                  v-bind="props"
+                  icon
+                  style="font-size: 24px;"
+                  @click="toggleMenu"
+                >
                   <v-icon>mdi-account</v-icon>
                 </v-btn>
               </template>
@@ -114,14 +119,14 @@ onUnmounted(() => {
               <v-list-item-title>Понравившиеся</v-list-item-title>
             </div>
           </v-list-item>
-          <v-spacer/>
+          <v-spacer />
           <v-list-item class="pa-0 d-flex justify-end">
-            <v-btn @click.stop="isSidebarCollapsed = !isSidebarCollapsed" variant="text" :icon="collapseSidebarIcon"/>
+            <v-btn variant="text" :icon="collapseSidebarIcon" @click.stop="isSidebarCollapsed = !isSidebarCollapsed" />
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
       <v-main class="">
-        <router-view/>
+        <router-view />
       </v-main>
     </div>
   </v-app>

@@ -1,9 +1,9 @@
 <script setup>
-import {useRoute, useRouter} from "vue-router";
+import {useRoute, useRouter} from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
-const isRegistrationActive = route.name === "registration";
+const isRegistrationActive = route.name === 'registration';
 
 </script>
 
@@ -18,7 +18,7 @@ const isRegistrationActive = route.name === "registration";
           Регистрация
         </div>
       </div>
-      <slot/>
+      <slot></slot>
     </div>
   </div>
 </template>

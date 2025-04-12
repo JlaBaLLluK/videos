@@ -1,17 +1,17 @@
 <script setup>
-import BaseAuthView from "@/views/base/BaseAuthView.vue";
-import {ref} from "vue";
-import {useRouter} from "vue-router";
-import {userLogin} from "@/api/index.js";
+import BaseAuthView from '@/views/base/BaseAuthView.vue';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {userLogin} from '@/api/index.js';
 
 const form = ref({
-  username_or_email: "",
-  password: "",
+  username_or_email: '',
+  password: '',
 });
 const formErrors = ref({});
 const passwordShown = ref(false);
 
-const router = useRouter()
+const router = useRouter();
 
 async function submit() {
   const response = await userLogin(form.value);
@@ -24,36 +24,44 @@ async function submit() {
 </script>
 
 <template>
-  <BaseAuthView>
-    <v-form :class="{'mt-2': formErrors.detail, 'mt-6': !formErrors.detail}"
-            @submit.prevent="submit">
-      <label class="wrong-cred fs-5 text-danger w-100 text-center mb-5"
-             v-if="formErrors.detail">{{ formErrors.detail }}</label>
+  <base-auth-view>
+    <v-form
+      :class="{'mt-2': formErrors.detail, 'mt-6': !formErrors.detail}"
+      @submit.prevent="submit"
+    >
+      <label
+        v-if="formErrors.detail"
+        class="wrong-cred fs-5 text-danger w-100 text-center mb-5"
+      >
+        {{ formErrors.detail }}
+      </label>
       <v-text-field
-          v-model="form.username_or_email"
-          variant="outlined"
-          density="compact"
-          id="username"
-          label="Имя пользователя или эл. почта"
-          placeholder="Введите имя пользователя или эл. почту"
-          :error-messages="formErrors.username_or_email"/>
+        id="username"
+        v-model="form.username_or_email"
+        variant="outlined"
+        density="compact"
+        label="Имя пользователя или эл. почта"
+        placeholder="Введите имя пользователя или эл. почту"
+        :error-messages="formErrors.username_or_email"
+      />
       <v-text-field
-          class="mt-3"
-          v-model="form.password"
-          variant="outlined"
-          density="compact"
-          id="password"
-          label="Пароль"
-          placeholder="Введите пароль"
-          :type="passwordShown ? 'text' : 'password'"
-          :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="passwordShown = !passwordShown"
-          :error-messages="formErrors.password"/>
+        id="password"
+        v-model="form.password"
+        class="mt-3"
+        variant="outlined"
+        density="compact"
+        label="Пароль"
+        placeholder="Введите пароль"
+        :type="passwordShown ? 'text' : 'password'"
+        :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
+        :error-messages="formErrors.password"
+        @click:append-inner="passwordShown = !passwordShown"
+      />
       <div class="w-100 text-center">
         <v-btn variant="outlined" type="submit" class="mt-3">Войти</v-btn>
       </div>
     </v-form>
-  </BaseAuthView>
+  </base-auth-view>
 </template>
 
 <style scoped>

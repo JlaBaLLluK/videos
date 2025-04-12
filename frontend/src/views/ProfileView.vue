@@ -1,14 +1,14 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import baseAPI from "@/api/api.js";
-import {getUserData} from "@/api/index.js";
+import {computed, onMounted, onUnmounted, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import baseAPI from '@/api/api.js';
+import {getUserData} from '@/api/index.js';
 
 const route = useRoute();
 
 const user = ref({});
-
 const username = ref(route.params.username);
+const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
 
 function updateDone() {
@@ -16,19 +16,28 @@ function updateDone() {
   username.value = user.value.username;
 }
 
+function profilePhotoChanged(photo) {
+  if (photo) {
+    profilePhoto.value = URL.createObjectURL(photo);
+  } else {
+    profilePhoto.value = null;
+  }
+}
+
 onMounted(async () => {
   document.title = username.value.toString();
-  user.value = JSON.parse(localStorage.getItem("user"))
+  user.value = JSON.parse(localStorage.getItem('user'));
+  profilePhoto.value = user.value.profile_photo;
   isChannelOwner.value = user.value.username === username.value;
   if (!isChannelOwner.value) {
     getUserData(username.value)
-        .then((response) => user.value = response.data)
+      .then((response) => user.value = response.data);
   }
 });
 
 onUnmounted(() => {
-  document.title = "VidFlow";
-})
+  document.title = 'VidFlow';
+});
 </script>
 
 <template>
@@ -36,13 +45,17 @@ onUnmounted(() => {
     <div class="d-flex justify-start">
       <div class="d-flex justify-space-between align-center ga-5">
         <v-avatar size="100" rounded="lg">
-          <v-img v-if="user.profile_photo" :src="user.profile_photo"/>
-          <span class="default-photo fs-1" v-else>{{ username[0].toUpperCase() }}</span>
+          <v-img v-if="profilePhoto" :src="profilePhoto" />
+          <span v-else class="default-photo fs-1">{{ username[0].toUpperCase() }}</span>
         </v-avatar>
         <div class="d-flex flex-column">
           <span class="fs-3">{{ user.channel_name || username }}</span>
-          <span class="fs-5 cursor-pointer"
-                @click="$router.push({name: 'profile', params: {username: username}})">@{{ username }}</span>
+          <span
+            class="fs-5 cursor-pointer"
+            @click="$router.push({name: 'profile', params: {username: username}})"
+          >
+            @{{ username }}
+          </span>
         </div>
       </div>
     </div>
@@ -54,7 +67,7 @@ onUnmounted(() => {
         <v-btn variant="outlined" class="profile-btn">Управление видео</v-btn>
       </div>
       <div class="mt-5">
-        <router-view @update-done="updateDone"/>
+        <router-view @update-done="updateDone" @profilePhotoChanged="profilePhotoChanged" />
       </div>
     </div>
   </div>
