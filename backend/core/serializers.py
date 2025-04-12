@@ -71,7 +71,9 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
-        data["profile_photo"] = ""
+        if not data.get("profile_photo"):
+            data["profile_photo"] = ""
+
         return data
 
 
@@ -100,13 +102,19 @@ class UserCreateSerializer(BaseUserSerializer):
         return user
 
 
-class UserDetailSerializer(BaseUserSerializer):
+class UserUpdateSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + (
-            "profile_photo",
-            "created_at",
-            "channel_name",
-        )
+        fields = BaseUserSerializer.Meta.fields + ("profile_photo",)
+
+    def get_fields(self):
+        fields = super().get_fields()
+        fields["profile_photo"].allow_null = True
+        return fields
+
+
+class UserDetailSerializer(UserUpdateSerializer):
+    class Meta(UserUpdateSerializer.Meta):
+        fields = UserUpdateSerializer.Meta.fields + ("created_at", "channel_name")
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

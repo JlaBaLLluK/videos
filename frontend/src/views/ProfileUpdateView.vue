@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import {updateUserData} from "@/api/index.js";
 import {useRouter} from "vue-router";
 
@@ -14,9 +14,10 @@ const form = ref({
   email: user.email,
   last_name: user.last_name,
   first_name: user.first_name,
-  // profile_photo: "",
+  profile_photo: null,
 });
 const errors = ref({});
+const profilePhotoPreview = ref(user.profile_photo);
 
 async function submit() {
   const response = await updateUserData(user.username, form.value);
@@ -27,6 +28,18 @@ async function submit() {
     await router.push({name: 'profile', params: {username: response.data.username}});
   }
 }
+
+watch(
+    () => form.value.profile_photo,
+    (file) => {
+      if (file) {
+        profilePhotoPreview.value = URL.createObjectURL(file);
+      } else {
+        profilePhotoPreview.value = null;
+      }
+    }
+);
+
 </script>
 
 <template>
@@ -69,7 +82,17 @@ async function submit() {
         placeholder="Введите фамилия"
         :error-messages="errors.last_name"
     />
-    <div class="w-100 text-center mt-3">
+    <v-file-input
+        v-model="form.profile_photo"
+        label="Выберите фото"
+        :error-messages="errors.profile_photo"
+    />
+    <div class="text-center">
+      <v-avatar size="200" rounded="lg" v-if="profilePhotoPreview">
+        <v-img :src="profilePhotoPreview"/>
+      </v-avatar>
+    </div>
+    <div class="text-center mt-3">
       <v-btn variant="outlined" type="submit">Сохранить</v-btn>
     </div>
   </v-form>

@@ -87,7 +87,11 @@ export async function getUserData(username) {
 
 export async function updateUserData(username, data) {
     try {
-        const response = await baseAPI.patch(`core/users/${username}/`, data);
+        const response = await baseAPI.patch(`core/users/${username}/`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
         await getMe();
         return {
             data: response.data,

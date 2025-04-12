@@ -17,7 +17,7 @@ function updateDone() {
 }
 
 onMounted(async () => {
-  document.title = username.toString();
+  document.title = username.value.toString();
   user.value = JSON.parse(localStorage.getItem("user"))
   isChannelOwner.value = user.value.username === username.value;
   if (!isChannelOwner.value) {
@@ -35,8 +35,8 @@ onUnmounted(() => {
   <div class="ma-6">
     <div class="d-flex justify-start">
       <div class="d-flex justify-space-between align-center ga-5">
-        <v-avatar size="80">
-          <v-img v-if="user.profile_photo"/>
+        <v-avatar size="100" rounded="lg">
+          <v-img v-if="user.profile_photo" :src="user.profile_photo"/>
           <span class="default-photo fs-1" v-else>{{ username[0].toUpperCase() }}</span>
         </v-avatar>
         <div class="d-flex flex-column">

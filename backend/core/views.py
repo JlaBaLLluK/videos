@@ -36,7 +36,9 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         return super().get_permissions()
 
     def get_serializer_class(self):
-        if self.action in ["update", "partial_update", "retrieve"]:
+        if self.action in ["update", "partial_update"]:
+            self.serializer_class = core_serializers.UserUpdateSerializer
+        elif self.action == "retrieve":
             self.serializer_class = core_serializers.UserDetailSerializer
 
         return super().get_serializer_class()
