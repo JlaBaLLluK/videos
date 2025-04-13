@@ -31,10 +31,15 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     file_fields_and_functions = {"profile_photo": core_models.profile_photo_upload_to}
     lookup_field = "username"
 
+    def get_authenticators(self):
+        if self.request.method in ["PATCH", "PUT"]:
+            self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
+
+        return super().get_authenticators()
+
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = []
-            self.authentication_classes = []
 
         return super().get_permissions()
 
