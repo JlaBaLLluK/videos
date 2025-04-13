@@ -3,7 +3,7 @@ import {onMounted, ref, watch} from 'vue';
 import {updateUserData} from '@/api/index.js';
 import {useRouter} from 'vue-router';
 
-const emits = defineEmits(['updateDone', 'profilePhotoChanged']);
+const emits = defineEmits(['profilePhotoChanged']);
 
 const router = useRouter();
 
@@ -25,7 +25,6 @@ async function submit() {
   if (response.status !== 200) {
     errors.value = response.data;
   } else {
-    emits('updateDone');
     await router.push({name: 'profile', params: {username: response.data.username}});
   }
 }

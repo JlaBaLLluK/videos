@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -9,10 +10,27 @@ def profile_photo_upload_to(instance, filename):
 
 
 class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
-    email = models.EmailField(unique=True, error_messages={"unique": "Пользователь с такой почтой уже существует."})
+    username_validator = RegexValidator(
+        regex=r"^[a-zA-Z][a-zA-Z0-9_]*$",
+        message="Имя пользователя может содержать буквы латинского алфавита, цифры и символ нижнего подчеркивания.",
+    )
+    username = models.CharField(
+        unique=True,
+        validators=[username_validator],
+        max_length=255,
+        error_messages={"unique": "Это имя пользователя уже занято."},
+    )
+    email = models.EmailField(
+        unique=True, error_messages={"unique": "Эта почта уже занята."}
+    )
+
     profile_photo = models.ImageField(upload_to=profile_photo_upload_to, blank=True)
     description = models.TextField(blank=True)
 
     @property
     def channel_name(self):
-        return f"{self.last_name} {self.first_name}" if self.first_name or self.last_name else self.username
+        return (
+            f"{self.last_name} {self.first_name}"
+            if self.first_name or self.last_name
+            else self.username
+        )

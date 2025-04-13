@@ -80,7 +80,7 @@ class UserCreateSerializer(BaseUserSerializer):
         password_confirm = attrs.pop("password_confirm")
         if password != password_confirm:
             raise serializers.ValidationError(
-                {"password_confirm": "Пароли не совпадают"}
+                {"password_confirm": "Пароли не совпадают."}
             )
 
         return super().validate(attrs)

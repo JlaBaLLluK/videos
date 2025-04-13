@@ -10,11 +10,6 @@ const username = ref(route.params.username);
 const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
 
-function updateDone() {
-  user.value = JSON.parse(localStorage.getItem('user'));
-  username.value = user.value.username;
-}
-
 function profilePhotoChanged(photo) {
   if (photo) {
     profilePhoto.value = URL.createObjectURL(photo);
@@ -26,7 +21,7 @@ function profilePhotoChanged(photo) {
 onMounted(async () => {
   document.title = username.value.toString();
   user.value = JSON.parse(localStorage.getItem('user'));
-  isChannelOwner.value = user.value.username === username.value;
+  isChannelOwner.value = user.value?.username === username.value;
   if (!isChannelOwner.value) {
     const {data} = await getUserData(username.value);
     user.value = data;
@@ -49,7 +44,7 @@ onUnmounted(() => {
           <span v-else class="default-photo fs-1">{{ username[0].toUpperCase() }}</span>
         </v-avatar>
         <div class="d-flex flex-column">
-          <span class="fs-3">{{ user.channel_name || username }}</span>
+          <span class="fs-3">{{ user?.channel_name || username }}</span>
           <div>
             <span
               class="fs-5 cursor-pointer"
@@ -66,7 +61,7 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="w-50">
-      <p class="mt-3 text-justify fs-5">{{ user.description }}</p>
+      <p class="mt-3 text-justify fs-5">{{ user?.description }}</p>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
         <v-btn variant="outlined" class="profile-btn" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
@@ -74,7 +69,7 @@ onUnmounted(() => {
         <v-btn variant="outlined" class="profile-btn">Управление видео</v-btn>
       </div>
       <div class="mt-5">
-        <router-view @update-done="updateDone" @profile-photo-changed="profilePhotoChanged" />
+        <router-view @profile-photo-changed="profilePhotoChanged" />
       </div>
     </div>
   </div>

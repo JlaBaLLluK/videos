@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema_view, extend_schema
+from rest_framework.settings import api_settings
 
 from core import models as core_models
 from core import serializers as core_serializers
@@ -26,12 +27,14 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         core_permissions.IsUserItself,
         IsAuthenticatedOrReadOnly,
     ]
+    authentication_classes = []
     file_fields_and_functions = {"profile_photo": core_models.profile_photo_upload_to}
     lookup_field = "username"
 
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = []
+            self.authentication_classes = []
 
         return super().get_permissions()
 
@@ -68,6 +71,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         methods=["GET"],
         detail=False,
         serializer_class=core_serializers.UserDetailSerializer,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     )
     def me(self, request):
         serializer = self.get_serializer(instance=request.user)
