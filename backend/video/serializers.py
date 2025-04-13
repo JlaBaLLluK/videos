@@ -21,7 +21,7 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class WatchesHistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = video_models.WatchesHistory
+        model = video_models.ViewsHistory
         fields = ("user", "video")
 
 

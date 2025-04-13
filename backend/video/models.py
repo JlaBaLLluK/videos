@@ -4,11 +4,11 @@ from core import mixins as core_mixins
 
 
 def video_upload_to(instance, filename):
-    return f"{instance.author.id}/VIDEO_{instance.id}/video.{filename.split(".")[-1]}"
+    return f"USER_{instance.author.id}/VIDEO_{instance.id}/video.{filename.split(".")[-1]}"
 
 
 def video_preview_upload_to(instance, filename):
-    return f"{instance.author.id}/VIDEO_{instance.id}/preview.{filename.split(".")[-1]}"
+    return f"USER_{instance.author.id}/VIDEO_{instance.id}/preview.{filename.split(".")[-1]}"
 
 
 class Video(core_mixins.CreatedUpdatedMixin):
@@ -20,9 +20,9 @@ class Video(core_mixins.CreatedUpdatedMixin):
         "core.User", on_delete=models.CASCADE, related_name="uploaded_videos"
     )
     users_watched_video = models.ManyToManyField(
-        to="core.User", related_name="watched_videos", through="video.WatchesHistory"
+        to="core.User", related_name="watched_videos", through="video.ViewsHistory"
     )
-    watches_count = models.PositiveIntegerField(default=0)
+    views_count = models.PositiveIntegerField(default=0)
     users_liked_video = models.ManyToManyField(
         to="core.User", related_name="liked_videos", through="video.LikesHistory"
     )
@@ -43,7 +43,7 @@ class AbstractUserVideoModel(models.Model):
         abstract = True
 
 
-class WatchesHistory(AbstractUserVideoModel):
+class ViewsHistory(AbstractUserVideoModel):
     pass
 
 

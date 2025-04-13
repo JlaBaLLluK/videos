@@ -42,15 +42,6 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[
-            validators.UniqueValidator(
-                queryset=core_models.User.objects.all(),
-                message="Пользователь с такой почтой уже существует.",
-            )
-        ]
-    )
-
     class Meta:
         model = User
         fields = (
@@ -105,11 +96,6 @@ class UserCreateSerializer(BaseUserSerializer):
 class UserUpdateSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         fields = BaseUserSerializer.Meta.fields + ("profile_photo",)
-
-    def get_fields(self):
-        fields = super().get_fields()
-        fields["profile_photo"].allow_null = True
-        return fields
 
 
 class UserDetailSerializer(UserUpdateSerializer):

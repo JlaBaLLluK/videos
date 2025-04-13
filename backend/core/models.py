@@ -9,8 +9,9 @@ def profile_photo_upload_to(instance, filename):
 
 
 class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, error_messages={"unique": "Пользователь с такой почтой уже существует."})
     profile_photo = models.ImageField(upload_to=profile_photo_upload_to, blank=True)
+    description = models.TextField(blank=True)
 
     @property
     def channel_name(self):

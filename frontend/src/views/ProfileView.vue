@@ -1,7 +1,6 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
-import baseAPI from '@/api/api.js';
+import {onMounted, onUnmounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
 import {getUserData} from '@/api/index.js';
 
 const route = useRoute();
@@ -67,7 +66,7 @@ onUnmounted(() => {
         <v-btn variant="outlined" class="profile-btn">Управление видео</v-btn>
       </div>
       <div class="mt-5">
-        <router-view @update-done="updateDone" @profilePhotoChanged="profilePhotoChanged" />
+        <router-view @update-done="updateDone" @profile-photo-changed="profilePhotoChanged" />
       </div>
     </div>
   </div>
