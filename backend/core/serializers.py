@@ -3,7 +3,7 @@ from typing import Dict, Any
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from rest_framework_simplejwt import serializers as jwt_serializer
 
 from core import models as core_models
@@ -95,7 +95,7 @@ class UserCreateSerializer(BaseUserSerializer):
 
 class UserUpdateSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + ("profile_photo",)
+        fields = BaseUserSerializer.Meta.fields + ("profile_photo", "description")
 
 
 class UserDetailSerializer(UserUpdateSerializer):

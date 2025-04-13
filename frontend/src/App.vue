@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {userLogout} from '@/api/index.js';
 
@@ -126,7 +126,7 @@ onUnmounted(() => {
         </v-list>
       </v-navigation-drawer>
       <v-main class="">
-        <router-view />
+        <router-view :key="$route.fullPath" />
       </v-main>
     </div>
   </v-app>
