@@ -99,8 +99,20 @@ class UserUpdateSerializer(BaseUserSerializer):
 
 
 class UserDetailSerializer(UserUpdateSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta(UserUpdateSerializer.Meta):
-        fields = UserUpdateSerializer.Meta.fields + ("created_at", "channel_name")
+        fields = UserUpdateSerializer.Meta.fields + (
+            "created_at",
+            "channel_name",
+            "subscribers_count",
+            "subscriptions_count",
+            "is_subscribed",
+        )
+
+    def get_is_subscribed(self, instance):
+        user = self.context["request"].user
+        return user.is_authenticated and user in instance.subscribers.all()
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

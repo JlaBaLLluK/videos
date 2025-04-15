@@ -104,3 +104,19 @@ export async function updateUserData(username, data) {
     };
   }
 }
+
+export async function subscribe(username) {
+  try {
+    const response = await baseAPI.put(`core/users/${username}/subscribe/`);
+    return {
+      data: response.data,
+      status: response.status,
+    };
+  }
+  catch (error) {
+    return {
+      data: error.response.data,
+      status: error.response.status,
+    };
+  }
+}

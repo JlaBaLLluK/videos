@@ -23,14 +23,24 @@ class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
     email = models.EmailField(
         unique=True, error_messages={"unique": "Эта почта уже занята."}
     )
-
     profile_photo = models.ImageField(upload_to=profile_photo_upload_to, blank=True)
     description = models.TextField(blank=True)
+    subscriptions = models.ManyToManyField(
+        "self", symmetrical=False, related_name="subscribers"
+    )
 
     @property
-    def channel_name(self):
+    def channel_name(self) -> str:
         return (
             f"{self.last_name} {self.first_name}"
             if self.first_name or self.last_name
             else self.username
         )
+
+    @property
+    def subscribers_count(self) -> int:
+        return self.subscribers.count()
+
+    @property
+    def subscriptions_count(self) -> int:
+        return self.subscriptions.count()

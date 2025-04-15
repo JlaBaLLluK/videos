@@ -4,7 +4,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.settings import api_settings
+from rest_framework.status import HTTP_200_OK
 
+from core.authentication import JwtAuthenticationNoException
 from core import models as core_models
 from core import serializers as core_serializers
 from core import permissions as core_permissions
@@ -34,12 +36,16 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     def get_authenticators(self):
         if self.request.method in ["PATCH", "PUT"]:
             self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
+        elif self.request.method == "GET":
+            self.authentication_classes = [JwtAuthenticationNoException]
 
         return super().get_authenticators()
 
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = []
+        elif self.action == "subscribe":
+            self.permission_classes = [IsAuthenticatedOrReadOnly]
 
         return super().get_permissions()
 
@@ -56,9 +62,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         instance.profile_photo.delete(save=False)
         super().perform_update(serializer)
 
-    @extend_schema(
-        description="Update user password",
-    )
+    @extend_schema(description="Update user password")
     @action(
         methods=["PATCH"],
         detail=True,
@@ -81,3 +85,21 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     def me(self, request):
         serializer = self.get_serializer(instance=request.user)
         return Response(serializer.data)
+
+    @action(methods=["PUT"], detail=True)
+    def subscribe(self, request, *args, **kwargs):
+        target_user = self.get_object()
+        if request.user in target_user.subscribers.all():
+            target_user.subscribers.remove(request.user)
+            is_subscribed = False
+        else:
+            target_user.subscribers.add(request.user)
+            is_subscribed = True
+
+        return Response(
+            {
+                "subscribers_count": target_user.subscribers_count,
+                "is_subscribed": is_subscribed,
+            },
+            status=HTTP_200_OK,
+        )

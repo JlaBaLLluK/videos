@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, onUnmounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import {getUserData} from '@/api/index.js';
+import {getUserData, subscribe} from '@/api/index.js';
 
 const route = useRoute();
 
@@ -9,12 +9,28 @@ const user = ref({});
 const username = ref(route.params.username);
 const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
+const subscribeButtonText = ref('');
+const subscribersCount = ref(0);
 
 function profilePhotoChanged(photo) {
   if (photo) {
     profilePhoto.value = URL.createObjectURL(photo);
   } else {
     profilePhoto.value = null;
+  }
+}
+
+async function subscribeClicked() {
+  const response = await subscribe(username.value);
+  setSubscribeButtonText(response.data.is_subscribed);
+  subscribersCount.value = response.data.subscribers_count;
+}
+
+function setSubscribeButtonText(isSubscribed) {
+  if (isSubscribed) {
+    subscribeButtonText.value = 'Отписаться';
+  } else {
+    subscribeButtonText.value = 'Подписаться';
   }
 }
 
@@ -28,6 +44,8 @@ onMounted(async () => {
   }
 
   profilePhoto.value = user.value.profile_photo;
+  subscribersCount.value = user.value.subscribers_count;
+  setSubscribeButtonText(user.value.is_subscribed);
 });
 
 onUnmounted(() => {
@@ -53,10 +71,17 @@ onUnmounted(() => {
               @{{ username }}
             </span>
             <span>
-              · 99999 подписчиков · 555 видео
+              · {{ subscribersCount }} подписчика(ов) · 555 видео
             </span>
           </div>
-          <v-btn v-if="!isChannelOwner" variant="outlined" class="profile-btn w-50 mt-3">Подписаться</v-btn>
+          <v-btn
+            v-if="!isChannelOwner"
+            variant="outlined"
+            class="profile-btn w-50 mt-3"
+            @click="subscribeClicked"
+          >
+            {{ subscribeButtonText }}
+          </v-btn>
         </div>
       </div>
     </div>
