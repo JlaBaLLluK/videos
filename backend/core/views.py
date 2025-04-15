@@ -113,3 +113,13 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     def subscribers(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=request.user.subscribers, many=True)
         return Response(serializer.data, HTTP_200_OK)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        serializer_class=serializers.UserListSerializer,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    )
+    def subscriptions(self, request, *args, **kwargs):
+        serializer = self.get_serializer(instance=request.user.subscriptions, many=True)
+        return Response(serializer.data, HTTP_200_OK)

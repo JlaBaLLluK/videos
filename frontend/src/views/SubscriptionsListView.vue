@@ -6,10 +6,12 @@ import UsersList from '@/components/UsersList.vue';
 
 const loading = ref(true);
 const items = ref([]);
+const haveDataText = ref('');
 
 onMounted(async () => {
-  const {data} = await getUsersList('core/users/subscribers/');
+  const {data} = await getUsersList('core/users/subscriptions/');
   items.value = data;
+  haveDataText.value = `Ваши подписки (${items.value.length}):`;
   loading.value = false;
 });
 </script>
@@ -19,8 +21,8 @@ onMounted(async () => {
   <div v-else class="w-75">
     <users-list
       :items="items"
-      no-data-text="У вас пока нет подписчиков"
-      have-data-text="Ваши подписчики"
+      no-data-text="У вас пока нет подписок"
+      :have-data-text="haveDataText"
     />
   </div>
 </template>

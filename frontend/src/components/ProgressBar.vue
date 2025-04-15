@@ -12,7 +12,6 @@
 }
 
 .progress-bar {
-  color: gray !important;
   position: absolute;
   left: 0;
   top: 60px !important;

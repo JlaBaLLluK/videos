@@ -121,9 +121,9 @@ export async function subscribe(username) {
   }
 }
 
-export async function getSubscribersList() {
+export async function getUsersList(url) {
   try {
-    const response = await baseAPI.get('core/users/subscribers/');
+    const response = await baseAPI.get(url);
     return {
       data: response.data,
       status: response.status,

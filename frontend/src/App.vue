@@ -87,12 +87,12 @@ onUnmounted(() => {
           </div>
         </nav>
       </v-app-bar>
-      <v-navigation-drawer v-if="showSidebar" :width="250" :rail="isSidebarCollapsed">
+      <v-navigation-drawer v-if="showSidebar" :width="260" :rail="isSidebarCollapsed">
         <v-list class="d-flex flex-column h-100">
-          <v-list-item link>
+          <v-list-item link :to="{name: 'subscriptionsList'}">
             <div class="d-flex ga-3">
-              <v-icon>mdi-history</v-icon>
-              <v-list-item-title>История</v-list-item-title>
+              <v-icon>mdi-account-group-outline</v-icon>
+              <v-list-item-title>Подписки</v-list-item-title>
             </div>
           </v-list-item>
           <v-list-item link>
@@ -109,14 +109,20 @@ onUnmounted(() => {
           </v-list-item>
           <v-list-item link>
             <div class="d-flex ga-3">
+              <v-icon>mdi-thumb-up-outline</v-icon>
+              <v-list-item-title>Понравившиеся</v-list-item-title>
+            </div>
+          </v-list-item>
+          <v-list-item link>
+            <div class="d-flex ga-3">
               <v-icon>mdi-clock-outline</v-icon>
               <v-list-item-title>Смотреть позже</v-list-item-title>
             </div>
           </v-list-item>
           <v-list-item link>
             <div class="d-flex ga-3">
-              <v-icon>mdi-thumb-up-outline</v-icon>
-              <v-list-item-title>Понравившиеся</v-list-item-title>
+              <v-icon>mdi-history</v-icon>
+              <v-list-item-title>История просмотров</v-list-item-title>
             </div>
           </v-list-item>
           <v-spacer />
@@ -126,7 +132,9 @@ onUnmounted(() => {
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <router-view :key="$route.fullPath" />
+        <div class="ma-6">
+          <router-view :key="$route.fullPath" />
+        </div>
       </v-main>
     </div>
   </v-app>

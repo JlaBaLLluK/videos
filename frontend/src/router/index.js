@@ -38,6 +38,11 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/subscriptions',
+    name: 'subscriptionsList',
+    component: () => import('@/views/SubscriptionsListView.vue')
+  }
 ];
 
 const router = createRouter({

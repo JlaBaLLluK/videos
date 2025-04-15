@@ -59,7 +59,7 @@ onUnmounted(() => {
 
 <template>
   <progress-bar v-if="loading" />
-  <div v-else class="ma-6">
+  <div v-else>
     <div class="d-flex justify-start">
       <div class="d-flex justify-space-between align-center ga-5">
         <profile-avatar
