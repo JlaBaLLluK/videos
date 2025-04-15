@@ -2,6 +2,8 @@
 import {onMounted, onUnmounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import {getUserData, subscribe} from '@/api/index.js';
+import ProgressBar from '@/components/ProgressBar.vue';
+import ProfileAvatar from '@/components/ProfileAvatar.vue';
 
 const route = useRoute();
 
@@ -11,6 +13,7 @@ const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
 const subscribeButtonText = ref('');
 const subscribersCount = ref(0);
+const loading = ref(true);
 
 function profilePhotoChanged(photo) {
   if (photo) {
@@ -46,6 +49,7 @@ onMounted(async () => {
   profilePhoto.value = user.value.profile_photo;
   subscribersCount.value = user.value.subscribers_count;
   setSubscribeButtonText(user.value.is_subscribed);
+  loading.value = false;
 });
 
 onUnmounted(() => {
@@ -54,13 +58,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ma-6">
+  <progress-bar v-if="loading" />
+  <div v-else class="ma-6">
     <div class="d-flex justify-start">
       <div class="d-flex justify-space-between align-center ga-5">
-        <v-avatar size="150" rounded="lg">
-          <v-img v-if="profilePhoto" :src="profilePhoto" />
-          <span v-else class="default-photo fs-1">{{ username[0].toUpperCase() }}</span>
-        </v-avatar>
+        <profile-avatar
+          :profile-photo="profilePhoto"
+          :username="username"
+        />
         <div class="d-flex flex-column">
           <span class="fs-3">{{ user?.channel_name || username }}</span>
           <div>
@@ -70,14 +75,20 @@ onUnmounted(() => {
             >
               @{{ username }}
             </span>
+            <span
+              :class="{'cursor-pointer': isChannelOwner}"
+              @click="isChannelOwner ? $router.push({name: 'subscribersList'}) : null"
+            >
+              · {{ subscribersCount }} подписчика(ов)
+            </span>
             <span>
-              · {{ subscribersCount }} подписчика(ов) · 555 видео
+              · {{ user.videos_count }} видео
             </span>
           </div>
           <v-btn
             v-if="!isChannelOwner"
             variant="outlined"
-            class="profile-btn w-50 mt-3"
+            class="profile-btn mt-3 w-75"
             @click="subscribeClicked"
           >
             {{ subscribeButtonText }}
@@ -93,18 +104,14 @@ onUnmounted(() => {
         </v-btn>
         <v-btn variant="outlined" class="profile-btn">Управление видео</v-btn>
       </div>
-      <div class="mt-5">
-        <router-view @profile-photo-changed="profilePhotoChanged" />
-      </div>
+    </div>
+    <div class="mt-5 w-100">
+      <router-view @profile-photo-changed="profilePhotoChanged" />
     </div>
   </div>
 </template>
 
 <style scoped>
-:deep(.v-avatar) {
-  box-shadow: 0 0 10px 4px rgba(0, 0, 0, 0.15);;
-}
-
 .profile-btn {
   border-radius: 10px;
   font-size: 14px;

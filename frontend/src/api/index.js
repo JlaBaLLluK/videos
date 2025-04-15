@@ -31,7 +31,7 @@ export async function userRegistration(credentials) {
 export async function userLogin(credentials) {
   try {
     const response = await baseAPI.post('auth/login/', credentials);
-    const {access, refresh, username} = response.data;
+    const {access, refresh} = response.data;
     localStorage.setItem('accessToken', access);
     localStorage.setItem('refreshToken', refresh);
     baseAPI.defaults.headers['Authorization'] = `Bearer ${access}`;
@@ -114,6 +114,21 @@ export async function subscribe(username) {
     };
   }
   catch (error) {
+    return {
+      data: error.response.data,
+      status: error.response.status,
+    };
+  }
+}
+
+export async function getSubscribersList() {
+  try {
+    const response = await baseAPI.get('core/users/subscribers/');
+    return {
+      data: response.data,
+      status: response.status,
+    };
+  } catch (error) {
     return {
       data: error.response.data,
       status: error.response.status,

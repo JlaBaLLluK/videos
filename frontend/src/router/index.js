@@ -30,6 +30,11 @@ const routes = [
         path: 'update',
         name: 'profileUpdate',
         component: () => import('@/views/ProfileUpdateView.vue'),
+      },
+      {
+        path: 'subscribers',
+        name: 'subscribersList',
+        component: () => import('@/views/SubscribersListView.vue')
       }
     ]
   },

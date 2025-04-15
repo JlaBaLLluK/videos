@@ -49,64 +49,66 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-form @submit.prevent="submit">
-    <v-text-field
-      v-model="form.username"
-      variant="outlined"
-      density="compact"
-      label="Имя пользователя"
-      placeholder="Введите имя пользователя"
-      :error-messages="errors.username"
-    />
-    <v-text-field
-      v-model="form.email"
-      class="mt-3"
-      variant="outlined"
-      density="compact"
-      type="email"
-      label="Электронная почта"
-      placeholder="Введите электронную почту"
-      :error-messages="errors.email"
-    />
-    <v-text-field
-      v-model="form.first_name"
-      class="mt-3"
-      variant="outlined"
-      density="compact"
-      type="email"
-      label="Имя"
-      placeholder="Введите имя"
-      :error-messages="errors.first_name"
-    />
-    <v-text-field
-      v-model="form.last_name"
-      class="mt-3"
-      variant="outlined"
-      density="compact"
-      type="text"
-      label="Фамилия"
-      placeholder="Введите фамилия"
-      :error-messages="errors.last_name"
-    />
-    <v-textarea
-      v-model="form.description"
-      class="mt-3"
-      variant="outlined"
-      density="compact"
-      type="text"
-      label="Описание"
-      placeholder="Введите описание"
-      :error-messages="errors.description"
-    />
-    <v-file-input
-      v-model="form.profile_photo"
-      label="Выберите фото"
-      :error-messages="errors.profile_photo"
-    />
-    <div class="text-center mt-3">
-      <v-btn variant="outlined" type="submit" width="200">Сохранить</v-btn>
-    </div>
-  </v-form>
+  <div class="w-50">
+    <v-form @submit.prevent="submit">
+      <v-text-field
+        v-model="form.username"
+        variant="outlined"
+        density="compact"
+        label="Имя пользователя"
+        placeholder="Введите имя пользователя"
+        :error-messages="errors.username"
+      />
+      <v-text-field
+        v-model="form.email"
+        class="mt-3"
+        variant="outlined"
+        density="compact"
+        type="email"
+        label="Электронная почта"
+        placeholder="Введите электронную почту"
+        :error-messages="errors.email"
+      />
+      <v-text-field
+        v-model="form.first_name"
+        class="mt-3"
+        variant="outlined"
+        density="compact"
+        type="email"
+        label="Имя"
+        placeholder="Введите имя"
+        :error-messages="errors.first_name"
+      />
+      <v-text-field
+        v-model="form.last_name"
+        class="mt-3"
+        variant="outlined"
+        density="compact"
+        type="text"
+        label="Фамилия"
+        placeholder="Введите фамилия"
+        :error-messages="errors.last_name"
+      />
+      <v-textarea
+        v-model="form.description"
+        class="mt-3"
+        variant="outlined"
+        density="compact"
+        type="text"
+        label="Описание"
+        placeholder="Введите описание"
+        :error-messages="errors.description"
+      />
+      <v-file-input
+        v-model="form.profile_photo"
+        label="Выберите фото"
+        :error-messages="errors.profile_photo"
+      />
+      <div class="text-center mt-3">
+        <v-btn variant="outlined" type="submit" width="200">Сохранить</v-btn>
+      </div>
+    </v-form>
+  </div>
 </template>
 
 <style scoped>

@@ -44,3 +44,7 @@ class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
     @property
     def subscriptions_count(self) -> int:
         return self.subscriptions.count()
+
+    @property
+    def videos_count(self) -> int:
+        return self.uploaded_videos.count()

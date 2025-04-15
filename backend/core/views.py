@@ -7,10 +7,10 @@ from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_200_OK
 
 from core.authentication import JwtAuthenticationNoException
-from core import models as core_models
-from core import serializers as core_serializers
-from core import permissions as core_permissions
-from core import mixins as core_mixins
+from core import models
+from core import serializers
+from core import permissions
+from core import mixins
 
 
 @extend_schema_view(
@@ -22,15 +22,15 @@ from core import mixins as core_mixins
     destroy=extend_schema(description="User delete"),
 )
 @extend_schema(tags=["User"])
-class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet):
-    queryset = core_models.User.objects.filter()
-    serializer_class = core_serializers.UserCreateSerializer
+class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet):
+    queryset = models.User.objects.filter()
+    serializer_class = serializers.UserCreateSerializer
     permission_classes = [
-        core_permissions.IsUserItself,
+        permissions.IsUserItself,
         IsAuthenticatedOrReadOnly,
     ]
     authentication_classes = []
-    file_fields_and_functions = {"profile_photo": core_models.profile_photo_upload_to}
+    file_fields_and_functions = {"profile_photo": models.profile_photo_upload_to}
     lookup_field = "username"
 
     def get_authenticators(self):
@@ -51,9 +51,9 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
-            self.serializer_class = core_serializers.UserUpdateSerializer
+            self.serializer_class = serializers.UserUpdateSerializer
         elif self.action == "retrieve":
-            self.serializer_class = core_serializers.UserDetailSerializer
+            self.serializer_class = serializers.UserDetailSerializer
 
         return super().get_serializer_class()
 
@@ -67,7 +67,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
         methods=["PATCH"],
         detail=True,
         url_path="update-password",
-        serializer_class=core_serializers.UpdatePasswordSerializer,
+        serializer_class=serializers.UpdatePasswordSerializer,
     )
     def update_password(self, request, username=None):
         serializer = self.get_serializer(data=request.data)
@@ -79,7 +79,7 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
     @action(
         methods=["GET"],
         detail=False,
-        serializer_class=core_serializers.UserDetailSerializer,
+        serializer_class=serializers.UserDetailSerializer,
         authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     )
     def me(self, request):
@@ -101,5 +101,15 @@ class UserViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelV
                 "subscribers_count": target_user.subscribers_count,
                 "is_subscribed": is_subscribed,
             },
-            status=HTTP_200_OK,
+            HTTP_200_OK,
         )
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        serializer_class=serializers.UserListSerializer,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    )
+    def subscribers(self, request, *args, **kwargs):
+        serializer = self.get_serializer(instance=request.user.subscribers, many=True)
+        return Response(serializer.data, HTTP_200_OK)

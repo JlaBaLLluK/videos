@@ -37,8 +37,24 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
         username = self.validate_username_or_email(attrs["username_or_email"])
         attrs["username"] = username
-        data = super().validate(attrs)
-        return data
+        return super().validate(attrs)
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("channel_name", "profile_photo", "username", "description")
+
+    @staticmethod
+    def get_description(instance):
+        description_parts = instance.description.split()
+        description_preview_parts = description_parts[:40]
+        if len(description_preview_parts) < len(description_parts):
+            description_preview_parts[-1] += "..."
+
+        return " ".join(description_preview_parts)
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -108,6 +124,7 @@ class UserDetailSerializer(UserUpdateSerializer):
             "subscribers_count",
             "subscriptions_count",
             "is_subscribed",
+            "videos_count",
         )
 
     def get_is_subscribed(self, instance):
