@@ -3,6 +3,7 @@ from typing import Dict, Any
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+from rest_framework.settings import api_settings
 from rest_framework_simplejwt import serializers as jwt_serializer
 
 from core import serializers_fields
@@ -39,9 +40,7 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
         return super().validate(attrs)
 
 
-class UserListSerializer(
-    mixins.UserSerializerMixin, serializers.ModelSerializer
-):
+class UserListSerializer(mixins.UserSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
@@ -93,6 +92,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
+    created_at = serializers.DateTimeField(format=api_settings.DATE_FORMAT)
+
     class Meta(UserUpdateSerializer.Meta):
         fields = UserUpdateSerializer.Meta.fields + (
             "created_at",
@@ -101,7 +102,7 @@ class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
             "subscriptions_count",
             "videos_count",
             "description_preview",
-            "is_request_user_subscribed"
+            "is_request_user_subscribed",
         )
 
 

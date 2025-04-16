@@ -132,6 +132,8 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_METADATA_CLASS": "rest_framework.metadata.SimpleMetadata",
+    "DATETIME_FORMAT": "%d.%m.%Y %H:%M:%S",
+    "DATE_FORMAT": "%d.%m.%Y",
 }
 
 SPECTACULAR_SETTINGS = {

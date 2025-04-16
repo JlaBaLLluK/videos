@@ -5,6 +5,7 @@ import {getUserData} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 import ProfileAvatar from '@/components/ProfileAvatar.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
+import UserDetail from '@/components/dialogs/UserDetail.vue';
 
 const route = useRoute();
 
@@ -12,6 +13,7 @@ const user = ref({});
 const username = ref(route.params.username);
 const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
+const detailDialogOpen = ref(false);
 
 const subscribersCount = ref(0);
 const loading = ref(true);
@@ -67,9 +69,6 @@ onUnmounted(() => {
             >
               · {{ subscribersCount }} подписчика(ов)
             </span>
-            <span>
-              · {{ user.videos_count }} видео
-            </span>
           </div>
           <subscribe-button
             v-if="!isChannelOwner && user"
@@ -80,7 +79,10 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="w-50">
-      <p class="mt-3 text-justify fs-5">{{ user?.description_preview }}</p>
+      <p class="mt-3 text-justify fs-5">
+        {{ user?.description_preview }}
+        <b class="cursor-pointer" @click="detailDialogOpen=true">ещё</b>
+      </p>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
         <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
@@ -92,4 +94,9 @@ onUnmounted(() => {
       <router-view @profile-photo-changed="profilePhotoChanged" />
     </div>
   </div>
+  <user-detail
+    v-if="user"
+    v-model="detailDialogOpen"
+    :user="user"
+  />
 </template>

@@ -123,11 +123,4 @@ export default [
       'vue/no-spaces-around-equal-signs-in-attribute': ['error'],
     },
   },
-
-  // {
-  //   rules: {
-  //     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-  //     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-  //   },
-  // },
 ];
