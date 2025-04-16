@@ -91,15 +91,15 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
         target_user = self.get_object()
         if request.user in target_user.subscribers.all():
             target_user.subscribers.remove(request.user)
-            is_subscribed = False
+            is_request_user_subscribed = False
         else:
             target_user.subscribers.add(request.user)
-            is_subscribed = True
+            is_request_user_subscribed = True
 
         return Response(
             {
                 "subscribers_count": target_user.subscribers_count,
-                "is_subscribed": is_subscribed,
+                "is_request_user_subscribed": is_request_user_subscribed,
             },
             HTTP_200_OK,
         )

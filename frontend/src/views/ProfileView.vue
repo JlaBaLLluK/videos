@@ -1,10 +1,10 @@
 <script setup>
 import {onMounted, onUnmounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
-import {getUserData, subscribe} from '@/api/index.js';
+import {getUserData} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 import ProfileAvatar from '@/components/ProfileAvatar.vue';
-import {getSubscribeButtonText} from '@/utils/userUtils.js';
+import SubscribeButton from '@/components/SubscribeButton.vue';
 
 const route = useRoute();
 
@@ -12,7 +12,7 @@ const user = ref({});
 const username = ref(route.params.username);
 const profilePhoto = ref(null);
 const isChannelOwner = ref(false);
-const subscribeButtonText = ref('');
+
 const subscribersCount = ref(0);
 const loading = ref(true);
 
@@ -22,12 +22,6 @@ function profilePhotoChanged(photo) {
   } else {
     profilePhoto.value = null;
   }
-}
-
-async function subscribeClicked() {
-  const response = await subscribe(username.value);
-  subscribeButtonText.value = getSubscribeButtonText(response.data.is_request_user_subscribed);
-  subscribersCount.value = response.data.subscribers_count;
 }
 
 onMounted(async () => {
@@ -41,7 +35,6 @@ onMounted(async () => {
 
   profilePhoto.value = user.value.profile_photo;
   subscribersCount.value = user.value.subscribers_count;
-  subscribeButtonText.value = getSubscribeButtonText(user.value.is_request_user_subscribed);
   loading.value = false;
 });
 
@@ -78,15 +71,11 @@ onUnmounted(() => {
               · {{ user.videos_count }} видео
             </span>
           </div>
-          <v-btn
-            v-if="!isChannelOwner"
-            variant="outlined"
-            width="150"
-            class="mt-3"
-            @click="subscribeClicked"
-          >
-            {{ subscribeButtonText }}
-          </v-btn>
+          <subscribe-button
+            v-if="!isChannelOwner && user"
+            :user="user"
+            @update-subscribers-count="(newSubscribersCount) => subscribersCount = newSubscribersCount"
+          />
         </div>
       </div>
     </div>

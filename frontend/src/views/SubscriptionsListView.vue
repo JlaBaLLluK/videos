@@ -28,6 +28,7 @@ onMounted(async () => {
       :items="items"
       no-data-text="У вас пока нет подписок"
       :have-data-text="haveDataText"
+      :need-remove-element="true"
       @subscribe-clicked="subscribeClicked"
     />
   </div>

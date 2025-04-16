@@ -40,11 +40,8 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
 
 
 class UserListSerializer(
-    mixins.UserDescriptionPreviewMixin, serializers.ModelSerializer
+    mixins.UserSerializerMixin, serializers.ModelSerializer
 ):
-    description_preview = serializers.SerializerMethodField()
-    is_request_user_subscribed = serializers.SerializerMethodField()
-
     class Meta:
         model = User
         fields = (
@@ -54,10 +51,6 @@ class UserListSerializer(
             "description_preview",
             "is_request_user_subscribed",
         )
-
-    def get_is_request_user_subscribed(self, instance):
-        user = self.context["request"].user
-        return user.is_authenticated and user in instance.subscribers.all()
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -99,7 +92,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         )
 
 
-class UserDetailSerializer(mixins.UserDescriptionPreviewMixin, UserUpdateSerializer):
+class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
     class Meta(UserUpdateSerializer.Meta):
         fields = UserUpdateSerializer.Meta.fields + (
             "created_at",
@@ -108,6 +101,7 @@ class UserDetailSerializer(mixins.UserDescriptionPreviewMixin, UserUpdateSeriali
             "subscriptions_count",
             "videos_count",
             "description_preview",
+            "is_request_user_subscribed"
         )
 
 

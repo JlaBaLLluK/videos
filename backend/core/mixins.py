@@ -46,8 +46,9 @@ class CreateObjectWithIdInFilePathMixin:
             default_storage.save(file_path, file_content)
 
 
-class UserDescriptionPreviewMixin(metaclass=serializers.SerializerMetaclass):
+class UserSerializerMixin(metaclass=serializers.SerializerMetaclass):
     description_preview = serializers.SerializerMethodField()
+    is_request_user_subscribed = serializers.SerializerMethodField()
 
     @staticmethod
     def get_description_preview(instance):
@@ -57,3 +58,7 @@ class UserDescriptionPreviewMixin(metaclass=serializers.SerializerMetaclass):
             description_preview_parts[-1] += "..."
 
         return " ".join(description_preview_parts)
+
+    def get_is_request_user_subscribed(self, instance):
+        user = self.context["request"].user
+        return user.is_authenticated and user in instance.subscribers.all()

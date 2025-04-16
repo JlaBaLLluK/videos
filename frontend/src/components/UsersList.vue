@@ -1,15 +1,27 @@
 <script setup>
 import ProfileAvatar from '@/components/ProfileAvatar.vue';
-import {getSubscribeButtonText} from '../utils/userUtils.js';
-import {subscribe} from '@/api/index.js';
+import SubscribeButton from '@/components/SubscribeButton.vue';
 
-defineProps(['items', 'noDataText', 'haveDataText']);
-const emits = defineEmits(['subscribeClicked']);
+defineProps({
+  noDataText: {
+    type: String
+  },
+  haveDataText: {
+    type: String
+  },
+  needRemoveElement: {
+    type: Boolean,
+    default: false
+  }
+});
 
-async function subscribeClicked(username) {
-  await subscribe(username);
-  emits('subscribeClicked', username);
+const items = defineModel('items');
+
+function removeElement(username) {
+  const removeIndex = items.value.indexOf(items.value.find((item) => item.username === username));
+  items.value.splice(removeIndex, 1);
 }
+
 </script>
 
 <template>
@@ -23,10 +35,12 @@ async function subscribeClicked(username) {
         v-for="(item, index) in items"
         :key="index"
         class="border-b pa-4"
-        :to="{name: 'profile', params: {'username': item.username}}"
       >
         <div class="d-flex justify-space-between">
-          <div class="d-flex ga-3">
+          <div
+            class="d-flex ga-3 cursor-pointer"
+            @click="$router.push({name: 'profile', params: {'username': item.username}})"
+          >
             <profile-avatar
               :size="65"
               :username="item.username"
@@ -38,20 +52,14 @@ async function subscribeClicked(username) {
             </div>
           </div>
           <div class="d-flex align-center">
-            <v-btn
-              variant="outlined"
-              width="150"
-              @click.prevent="subscribeClicked(item.username)"
-            >
-              {{ getSubscribeButtonText(item.is_request_user_subscribed) }}
-            </v-btn>
+            <subscribe-button
+              :user="item"
+              :need-remove-element="needRemoveElement"
+              @remove-element="removeElement"
+            />
           </div>
         </div>
       </v-list-item>
     </v-list>
   </div>
 </template>
-
-<style scoped>
-
-</style>
