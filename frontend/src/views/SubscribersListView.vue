@@ -7,6 +7,11 @@ import UsersList from '@/components/UsersList.vue';
 const loading = ref(true);
 const items = ref([]);
 
+async function subscribeClicked(username) {
+  const item = items.value.find((item) => item.username === username);
+  item.is_subscribed = !item.is_subscribed;
+}
+
 onMounted(async () => {
   const {data} = await getUsersList('core/users/subscribers/');
   items.value = data;
@@ -20,7 +25,8 @@ onMounted(async () => {
     <users-list
       :items="items"
       no-data-text="У вас пока нет подписчиков"
-      have-data-text="Ваши подписчики"
+      have-data-text="Ваши подписчики:"
+      @subscribe-clicked="subscribeClicked"
     />
   </div>
 </template>

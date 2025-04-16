@@ -4,6 +4,7 @@ import {useRoute} from 'vue-router';
 import {getUserData, subscribe} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 import ProfileAvatar from '@/components/ProfileAvatar.vue';
+import {getSubscribeButtonText} from '@/utils/userUtils.js';
 
 const route = useRoute();
 
@@ -25,16 +26,8 @@ function profilePhotoChanged(photo) {
 
 async function subscribeClicked() {
   const response = await subscribe(username.value);
-  setSubscribeButtonText(response.data.is_subscribed);
+  subscribeButtonText.value = getSubscribeButtonText(response.data.is_subscribed);
   subscribersCount.value = response.data.subscribers_count;
-}
-
-function setSubscribeButtonText(isSubscribed) {
-  if (isSubscribed) {
-    subscribeButtonText.value = 'Отписаться';
-  } else {
-    subscribeButtonText.value = 'Подписаться';
-  }
 }
 
 onMounted(async () => {
@@ -48,7 +41,7 @@ onMounted(async () => {
 
   profilePhoto.value = user.value.profile_photo;
   subscribersCount.value = user.value.subscribers_count;
-  setSubscribeButtonText(user.value.is_subscribed);
+  subscribeButtonText.value = getSubscribeButtonText(user.value.is_subscribed);
   loading.value = false;
 });
 
@@ -88,7 +81,8 @@ onUnmounted(() => {
           <v-btn
             v-if="!isChannelOwner"
             variant="outlined"
-            class="profile-btn mt-3 w-75"
+            width="150"
+            class="mt-3"
             @click="subscribeClicked"
           >
             {{ subscribeButtonText }}
@@ -99,10 +93,10 @@ onUnmounted(() => {
     <div class="w-50">
       <p class="mt-3 text-justify fs-5">{{ user?.description }}</p>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
-        <v-btn variant="outlined" class="profile-btn" @click="$router.push({name: 'profileUpdate'})">
+        <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
         </v-btn>
-        <v-btn variant="outlined" class="profile-btn">Управление видео</v-btn>
+        <v-btn variant="outlined">Управление видео</v-btn>
       </div>
     </div>
     <div class="mt-5 w-100">
@@ -110,11 +104,3 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.profile-btn {
-  border-radius: 10px;
-  font-size: 14px;
-}
-
-</style>

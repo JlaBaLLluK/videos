@@ -40,24 +40,9 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
         return super().validate(attrs)
 
 
-class UserListSerializer(serializers.ModelSerializer):
-    description = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ("channel_name", "profile_photo", "username", "description")
-
-    @staticmethod
-    def get_description(instance):
-        description_parts = instance.description.split()
-        description_preview_parts = description_parts[:40]
-        if len(description_preview_parts) < len(description_parts):
-            description_preview_parts[-1] += "..."
-
-        return " ".join(description_preview_parts)
-
-
 class BaseUserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
@@ -65,6 +50,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "is_subscribed",
         )
 
     def __init__(self, *args, **kwargs):
@@ -76,12 +62,39 @@ class BaseUserSerializer(serializers.ModelSerializer):
             )
         )
 
+    def get_is_subscribed(self, instance):
+        user = self.context["request"].user
+        return user.is_authenticated and user in instance.subscribers.all()
+
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
         if not data.get("profile_photo"):
             data["profile_photo"] = ""
 
         return data
+
+
+class UserListSerializer(BaseUserSerializer):
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            "channel_name",
+            "username",
+            "is_subscribed",
+            "profile_photo",
+            "description",
+        )
+
+    @staticmethod
+    def get_description(instance):
+        description_parts = instance.description.split()
+        description_preview_parts = description_parts[:40]
+        if len(description_preview_parts) < len(description_parts):
+            description_preview_parts[-1] += "..."
+
+        return " ".join(description_preview_parts)
 
 
 class UserCreateSerializer(BaseUserSerializer):
@@ -115,21 +128,14 @@ class UserUpdateSerializer(BaseUserSerializer):
 
 
 class UserDetailSerializer(UserUpdateSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-
     class Meta(UserUpdateSerializer.Meta):
         fields = UserUpdateSerializer.Meta.fields + (
             "created_at",
             "channel_name",
             "subscribers_count",
             "subscriptions_count",
-            "is_subscribed",
             "videos_count",
         )
-
-    def get_is_subscribed(self, instance):
-        user = self.context["request"].user
-        return user.is_authenticated and user in instance.subscribers.all()
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

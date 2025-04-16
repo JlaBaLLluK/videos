@@ -44,8 +44,6 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = []
-        elif self.action == "subscribe":
-            self.permission_classes = [IsAuthenticatedOrReadOnly]
 
         return super().get_permissions()
 
@@ -86,7 +84,9 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
         serializer = self.get_serializer(instance=request.user)
         return Response(serializer.data)
 
-    @action(methods=["PUT"], detail=True)
+    @action(
+        methods=["PUT"], detail=True, permission_classes=[IsAuthenticatedOrReadOnly]
+    )
     def subscribe(self, request, *args, **kwargs):
         target_user = self.get_object()
         if request.user in target_user.subscribers.all():
