@@ -2,12 +2,11 @@ from typing import Dict, Any
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework_simplejwt import serializers as jwt_serializer
 
-from core import models as core_models
 from core import serializers_fields
+from core import mixins
 
 User = get_user_model()
 
@@ -40,69 +39,34 @@ class TokenObtainPairSerializer(jwt_serializer.TokenObtainPairSerializer):
         return super().validate(attrs)
 
 
-class BaseUserSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-        )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["username"].validators.append(
-            RegexValidator(
-                regex=r"^[a-zA-Z][a-zA-Z0-9_]*$",
-                message="Имя пользователя может содержать буквы латинского алфавита, цифры и символ нижнего подчеркивания.",
-            )
-        )
-
-    def get_is_subscribed(self, instance):
-        user = self.context["request"].user
-        return user.is_authenticated and user in instance.subscribers.all()
-
-    def to_internal_value(self, data):
-        data = super().to_internal_value(data)
-        if not data.get("profile_photo"):
-            data["profile_photo"] = ""
-
-        return data
-
-
-class UserListSerializer(BaseUserSerializer):
-    description = serializers.SerializerMethodField()
+class UserListSerializer(
+    mixins.UserDescriptionPreviewMixin, serializers.ModelSerializer
+):
+    description_preview = serializers.SerializerMethodField()
+    is_request_user_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             "channel_name",
             "username",
-            "is_subscribed",
             "profile_photo",
-            "description",
+            "description_preview",
+            "is_request_user_subscribed",
         )
 
-    @staticmethod
-    def get_description(instance):
-        description_parts = instance.description.split()
-        description_preview_parts = description_parts[:40]
-        if len(description_preview_parts) < len(description_parts):
-            description_preview_parts[-1] += "..."
-
-        return " ".join(description_preview_parts)
+    def get_is_request_user_subscribed(self, instance):
+        user = self.context["request"].user
+        return user.is_authenticated and user in instance.subscribers.all()
 
 
-class UserCreateSerializer(BaseUserSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers_fields.PasswordField()
     password_confirm = serializers_fields.PasswordField()
 
-    class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + ("password", "password_confirm")
+    class Meta:
+        model = User
+        fields = ("username", "email", "password", "password_confirm")
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
         password = attrs.get("password")
@@ -116,18 +80,26 @@ class UserCreateSerializer(BaseUserSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = core_models.User(**validated_data)
+        user = User(**validated_data)
         user.set_password(password)
         user.save()
         return user
 
 
-class UserUpdateSerializer(BaseUserSerializer):
-    class Meta(BaseUserSerializer.Meta):
-        fields = BaseUserSerializer.Meta.fields + ("profile_photo", "description")
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "description",
+            "profile_photo",
+        )
 
 
-class UserDetailSerializer(UserUpdateSerializer):
+class UserDetailSerializer(mixins.UserDescriptionPreviewMixin, UserUpdateSerializer):
     class Meta(UserUpdateSerializer.Meta):
         fields = UserUpdateSerializer.Meta.fields + (
             "created_at",
@@ -135,6 +107,7 @@ class UserDetailSerializer(UserUpdateSerializer):
             "subscribers_count",
             "subscriptions_count",
             "videos_count",
+            "description_preview",
         )
 
 

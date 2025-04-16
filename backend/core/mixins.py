@@ -2,6 +2,8 @@ from django.db import models
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
+from rest_framework import serializers
+
 
 class CreatedUpdatedMixin(models.Model):
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
@@ -33,7 +35,7 @@ class CreateObjectWithIdInFilePathMixin:
             file_field_name,
             filename_function,
         ) in self.file_fields_and_functions.items():
-            if not serializer.validated_data[file_field_name]:
+            if not serializer.validated_data.get(file_field_name):
                 continue
 
             file_field = serializer.validated_data[file_field_name]
@@ -42,3 +44,16 @@ class CreateObjectWithIdInFilePathMixin:
             setattr(instance, file_field_name, file_path)
             instance.save()
             default_storage.save(file_path, file_content)
+
+
+class UserDescriptionPreviewMixin(metaclass=serializers.SerializerMetaclass):
+    description_preview = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_description_preview(instance):
+        description_parts = instance.description.split()
+        description_preview_parts = description_parts[:40]
+        if len(description_preview_parts) < len(description_parts):
+            description_preview_parts[-1] += "..."
+
+        return " ".join(description_preview_parts)

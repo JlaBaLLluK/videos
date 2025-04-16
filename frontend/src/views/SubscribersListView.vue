@@ -9,7 +9,7 @@ const items = ref([]);
 
 async function subscribeClicked(username) {
   const item = items.value.find((item) => item.username === username);
-  item.is_subscribed = !item.is_subscribed;
+  item.is_request_user_subscribed = !item.is_request_user_subscribed;
 }
 
 onMounted(async () => {

@@ -34,7 +34,7 @@ async function subscribeClicked(username) {
             />
             <div class="d-flex flex-column">
               <span style="font-size: 1.1rem">{{ item?.channel_name || username }}</span>
-              <span>{{ item.description }}</span>
+              <span>{{ item.description_preview }}</span>
             </div>
           </div>
           <div class="d-flex align-center">
@@ -43,7 +43,7 @@ async function subscribeClicked(username) {
               width="150"
               @click.prevent="subscribeClicked(item.username)"
             >
-              {{ getSubscribeButtonText(item.is_subscribed) }}
+              {{ getSubscribeButtonText(item.is_request_user_subscribed) }}
             </v-btn>
           </div>
         </div>

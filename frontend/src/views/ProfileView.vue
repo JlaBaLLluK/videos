@@ -26,7 +26,7 @@ function profilePhotoChanged(photo) {
 
 async function subscribeClicked() {
   const response = await subscribe(username.value);
-  subscribeButtonText.value = getSubscribeButtonText(response.data.is_subscribed);
+  subscribeButtonText.value = getSubscribeButtonText(response.data.is_request_user_subscribed);
   subscribersCount.value = response.data.subscribers_count;
 }
 
@@ -41,7 +41,7 @@ onMounted(async () => {
 
   profilePhoto.value = user.value.profile_photo;
   subscribersCount.value = user.value.subscribers_count;
-  subscribeButtonText.value = getSubscribeButtonText(user.value.is_subscribed);
+  subscribeButtonText.value = getSubscribeButtonText(user.value.is_request_user_subscribed);
   loading.value = false;
 });
 
@@ -91,7 +91,7 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="w-50">
-      <p class="mt-3 text-justify fs-5">{{ user?.description }}</p>
+      <p class="mt-3 text-justify fs-5">{{ user?.description_preview }}</p>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
         <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
