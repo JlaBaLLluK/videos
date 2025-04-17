@@ -105,6 +105,21 @@ export async function updateUserData(username, data) {
   }
 }
 
+export async function updateUserPassword(data) {
+  try {
+    const response = await baseAPI.patch('/core/users/update-password/', data);
+    return {
+      data: response.data,
+      status: response.status
+    };
+  } catch (error) {
+    return {
+      data: error.response.data,
+      status: error.response.status
+    };
+  }
+}
+
 export async function subscribe(username) {
   try {
     const response = await baseAPI.put(`core/users/${username}/subscribe/`);

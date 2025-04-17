@@ -2,6 +2,7 @@
 import {onMounted, ref, watch} from 'vue';
 import {updateUserData} from '@/api/index.js';
 import {useRouter} from 'vue-router';
+import UpdatePassword from '@/components/dialogs/UpdatePassword.vue';
 
 const emits = defineEmits(['profilePhotoChanged']);
 
@@ -19,6 +20,7 @@ const form = ref({
 });
 const errors = ref({});
 const profilePhotoPreview = ref(null);
+const updatePasswordDialogOpen = ref(false);
 
 async function submit() {
   const response = await updateUserData(user.username, form.value);
@@ -104,11 +106,13 @@ onMounted(async () => {
         label="Выберите фото"
         :error-messages="errors.profile_photo"
       />
-      <div class="text-center mt-3">
+      <p class="cursor-pointer" style="font-size: 1.1rem" @click="updatePasswordDialogOpen = true"><u>Сменить пароль</u></p>
+      <div class="d-flex w-100 justify-center ga-3">
         <v-btn variant="outlined" type="submit" width="200">Сохранить</v-btn>
       </div>
     </v-form>
   </div>
+  <update-password v-model="updatePasswordDialogOpen" />
 </template>
 
 <style scoped>

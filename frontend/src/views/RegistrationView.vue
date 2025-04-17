@@ -3,6 +3,7 @@ import BaseAuthView from '@/views/base/BaseAuthView.vue';
 import {ref} from 'vue';
 import {userRegistration} from '@/api/index.js';
 import {useRouter} from 'vue-router';
+import PasswordField from '@/components/PasswordField.vue';
 
 const form = ref({
   username: '',
@@ -48,29 +49,17 @@ async function submit() {
         placeholder="Введите электронную почту"
         :error-messages="formErrors.email"
       />
-      <v-text-field
+      <password-field
         v-model="form.password"
-        class="mt-3"
-        variant="outlined"
-        density="compact"
-        label="Пароль"
+        :errors="formErrors.password"
         placeholder="Введите пароль"
-        :type="passwordShown ? 'text' : 'password'"
-        :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
-        :error-messages="formErrors.password"
-        @click:append-inner="passwordShown = !passwordShown"
+        label="Пароль"
       />
-      <v-text-field
+      <password-field
         v-model="form.password_confirm"
-        class="mt-3"
-        variant="outlined"
-        density="compact"
-        label="Подтверждение пароля"
+        :errors="formErrors.password_confirm"
         placeholder="Введите пароль повторно"
-        :type="confirmPasswordShow ? 'text' : 'password'"
-        :append-inner-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
-        :error-messages="formErrors.password_confirm"
-        @click:append-inner="confirmPasswordShow = !confirmPasswordShow"
+        label="Подтверждение пароля"
       />
       <div class="w-100 text-center mt-3">
         <v-btn variant="outlined" type="submit">Зарегистрироваться</v-btn>

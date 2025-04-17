@@ -1,3 +1,5 @@
+from pickle import FALSE
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -63,11 +65,11 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     @extend_schema(description="Update user password")
     @action(
         methods=["PATCH"],
-        detail=True,
+        detail=False,
         url_path="update-password",
         serializer_class=serializers.UpdatePasswordSerializer,
     )
-    def update_password(self, request, username=None):
+    def update_password(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

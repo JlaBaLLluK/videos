@@ -16,9 +16,11 @@ baseAPI.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 404) {
-      console.log('404');
       router.push({name: 'notFound'});
-    } else {
+    } else if (error.response.status === 401) {
+      // мб сообщение выводить или редирект + логика обновления
+    }
+    else {
       return Promise.reject(error);
     }
   }

@@ -118,8 +118,15 @@ class UpdatePasswordSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+        if attrs["new_password"] == attrs["current_password"]:
+            raise serializers.ValidationError(
+                {"new_password": "Новый пароль не может совпадать со старым."}
+            )
+
         if attrs["new_password"] != attrs["new_password_confirm"]:
-            raise serializers.ValidationError("Пароли не совпадают.")
+            raise serializers.ValidationError(
+                {"new_password_confirm": "Пароли не совпадают."}
+            )
 
         return attrs
 

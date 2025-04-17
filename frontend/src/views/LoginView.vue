@@ -3,6 +3,7 @@ import BaseAuthView from '@/views/base/BaseAuthView.vue';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {userLogin} from '@/api/index.js';
+import PasswordField from '@/components/PasswordField.vue';
 
 const form = ref({
   username_or_email: '',
@@ -44,18 +45,11 @@ async function submit() {
         placeholder="Введите имя пользователя или эл. почту"
         :error-messages="formErrors.username_or_email"
       />
-      <v-text-field
-        id="password"
+      <password-field
         v-model="form.password"
-        class="mt-3"
-        variant="outlined"
-        density="compact"
+        :errors="formErrors.password"
         label="Пароль"
         placeholder="Введите пароль"
-        :type="passwordShown ? 'text' : 'password'"
-        :append-inner-icon="passwordShown ? 'mdi-eye' : 'mdi-eye-off'"
-        :error-messages="formErrors.password"
-        @click:append-inner="passwordShown = !passwordShown"
       />
       <div class="w-100 text-center">
         <v-btn variant="outlined" type="submit" class="mt-3">Войти</v-btn>

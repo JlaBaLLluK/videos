@@ -81,8 +81,10 @@ onUnmounted(() => {
     <div class="w-50">
       <p class="mt-3 text-justify fs-5">
         {{ user?.description_preview }}
-        <b class="cursor-pointer" @click="detailDialogOpen=true">ещё</b>
       </p>
+      <div v-if="$route.name !== 'profileUpdate'" class="mt-n5">
+        <b class="cursor-pointer" @click="detailDialogOpen=true">Ещё</b>
+      </div>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
         <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
