@@ -18,9 +18,9 @@ baseAPI.interceptors.response.use(
     if (error.response.status === 404) {
       router.push({name: 'notFound'});
     } else if (error.response.status === 401) {
-      // мб сообщение выводить или редирект + логика обновления
-    }
-    else {
+      // TODO: какое-то сообщение сверху мб
+      router.push({name: 'login'});
+    } else {
       return Promise.reject(error);
     }
   }

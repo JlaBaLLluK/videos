@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.settings import api_settings
@@ -13,6 +13,14 @@ from . import permissions
 from . import mixins
 
 
+class ModelViewSet(
+    mixins.ActionsSerializersMapMixin,
+    mixins.ActionsPermissionsMapMixin,
+    viewsets.ModelViewSet,
+):
+    pass
+
+
 @extend_schema_view(
     list=extend_schema(description="List or users"),
     create=extend_schema(description="Create new user"),
@@ -22,14 +30,30 @@ from . import mixins
     destroy=extend_schema(description="User delete"),
 )
 @extend_schema(tags=["User"])
-class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet):
+class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     queryset = models.User.objects.filter()
-    serializer_class = serializers.UserCreateSerializer
+    serializer_class = serializers.UserListSerializer
+    actions_serializers_map = {
+        "list": serializer_class,
+        "create": serializers.UserCreateSerializer,
+        "retrieve": serializers.UserDetailSerializer,
+        "update": serializers.UserUpdateSerializer,
+        "partial_update": serializers.UserUpdateSerializer,
+        "me": serializers.UserDetailSerializer,
+        "update_password": serializers.UpdatePasswordSerializer,
+        "subscribers": serializer_class,
+        "subscriptions": serializer_class,
+    }
     permission_classes = [
         permissions.IsUserItself,
         IsAuthenticatedOrReadOnly,
     ]
-    authentication_classes = []
+    actions_permissions_map = {
+        "create": [],
+        "subscribe": [IsAuthenticated],
+        "subscribers": [IsAuthenticated],
+        "subscriptions": [IsAuthenticated],
+    }
     file_fields_and_functions = {"profile_photo": models.profile_photo_upload_to}
     lookup_field = "username"
 
@@ -41,20 +65,6 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
 
         return super().get_authenticators()
 
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = []
-
-        return super().get_permissions()
-
-    def get_serializer_class(self):
-        if self.action in ["update", "partial_update"]:
-            self.serializer_class = serializers.UserUpdateSerializer
-        elif self.action == "retrieve":
-            self.serializer_class = serializers.UserDetailSerializer
-
-        return super().get_serializer_class()
-
     def perform_update(self, serializer):
         instance = self.get_object()
         instance.profile_photo.delete(save=False)
@@ -65,7 +75,6 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
         methods=["PATCH"],
         detail=False,
         url_path="update-password",
-        serializer_class=serializers.UpdatePasswordSerializer,
     )
     def update_password(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -77,16 +86,13 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     @action(
         methods=["GET"],
         detail=False,
-        serializer_class=serializers.UserDetailSerializer,
         authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     )
     def me(self, request):
         serializer = self.get_serializer(instance=request.user)
         return Response(serializer.data)
 
-    @action(
-        methods=["PUT"], detail=True, permission_classes=[IsAuthenticatedOrReadOnly]
-    )
+    @action(methods=["PUT"], detail=True)
     def subscribe(self, request, *args, **kwargs):
         target_user = self.get_object()
         if request.user in target_user.subscribers.all():
@@ -107,7 +113,6 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     @action(
         methods=["GET"],
         detail=False,
-        serializer_class=serializers.UserListSerializer,
         authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     )
     def subscribers(self, request, *args, **kwargs):
@@ -117,7 +122,6 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSe
     @action(
         methods=["GET"],
         detail=False,
-        serializer_class=serializers.UserListSerializer,
         authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     )
     def subscriptions(self, request, *args, **kwargs):

@@ -5,6 +5,27 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 
+class ActionsSerializersMapMixin:
+    actions_serializers_map: dict
+
+    def get_serializer_class(self):
+        return (
+            self.actions_serializers_map[self.action]
+            if self.action in self.actions_serializers_map
+            else super().get_serializer_class()
+        )
+
+
+class ActionsPermissionsMapMixin:
+    actions_permissions_map: dict
+
+    def get_permissions(self):
+        if self.action in self.actions_permissions_map:
+            self.permission_classes = self.actions_permissions_map[self.action]
+
+        return super().get_permissions()
+
+
 class CreatedUpdatedMixin(models.Model):
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
     updated_at = models.DateTimeField("Дата редактирования", auto_now=True)

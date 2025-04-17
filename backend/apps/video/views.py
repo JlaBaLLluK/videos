@@ -46,15 +46,13 @@ class VideoViewSet(
 
         return super().retrieve(request, *args, **kwargs)
 
-    @extend_schema(
-        description="Like video by user",
-    )
+    @extend_schema(description="Like video by user")
     @action(
         methods=["POST"],
         detail=True,
         permission_classes=[IsAuthenticatedOrReadOnly],
     )
-    def like(self, request, pk):
+    def like(self, request, *args, **kwargs):
         video = self.get_object()
         try:
             video_models.LikesHistory.objects.create(
@@ -74,15 +72,13 @@ class VideoViewSet(
         video.save()
         return Response({"success": response_message})
 
-    @extend_schema(
-        description="Dislike video by user",
-    )
+    @extend_schema(description="Dislike video by user")
     @action(
         methods=["POST"],
         detail=True,
         permission_classes=[IsAuthenticatedOrReadOnly],
     )
-    def dislike(self, request, pk):
+    def dislike(self, request, *args, **kwargs):
         video = self.get_object()
         try:
             video_models.DislikesHistory.objects.create(
@@ -102,9 +98,7 @@ class VideoViewSet(
         video.save()
         return Response({"success": response_message})
 
-    @extend_schema(
-        description="List of disliked by user videos",
-    )
+    @extend_schema(description="List of disliked by user videos")
     @action(
         methods=["GET"],
         detail=False,
@@ -117,9 +111,7 @@ class VideoViewSet(
         )
         return Response(serializer.data)
 
-    @extend_schema(
-        description="List of liked by user videos",
-    )
+    @extend_schema(description="List of liked by user videos")
     @action(
         methods=["GET"],
         detail=False,
@@ -132,9 +124,7 @@ class VideoViewSet(
         )
         return Response(serializer.data)
 
-    @extend_schema(
-        description="List of uploaded by user videos",
-    )
+    @extend_schema(description="List of uploaded by user videos")
     @action(
         methods=["GET"],
         detail=False,
