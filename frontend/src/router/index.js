@@ -14,34 +14,34 @@ const routes = [
   {
     path: '/registration',
     name: 'registration',
-    component: () => import('@/views/RegistrationView.vue'),
+    component: () => import('@/views/auth/RegistrationView.vue'),
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/LoginView.vue'),
+    component: () => import('@/views/auth/LoginView.vue'),
   },
   {
     path: '/:username',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue'),
+    component: () => import('@/views/core/ProfileView.vue'),
     children: [
       {
         path: 'update',
         name: 'profileUpdate',
-        component: () => import('@/views/ProfileUpdateView.vue'),
+        component: () => import('@/views/core/ProfileUpdateView.vue'),
       },
       {
         path: 'subscribers',
         name: 'subscribersList',
-        component: () => import('@/views/SubscribersListView.vue')
+        component: () => import('@/views/core/SubscribersListView.vue')
       }
     ]
   },
   {
     path: '/subscriptions',
     name: 'subscriptionsList',
-    component: () => import('@/views/SubscriptionsListView.vue')
+    component: () => import('@/views/core/SubscriptionsListView.vue')
   }
 ];
 
