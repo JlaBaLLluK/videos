@@ -1,0 +1,10 @@
+.notification {
+    border-radius: 8px;
+    padding: 20px 10px 20px 10px;
+    box-shadow: 0 0 4px 0 #d14f4f;
+    font-size: 19px;
+}
+
+.is-danger {
+    background-color: #e8b3b3;
+}

@@ -4,6 +4,7 @@ import router from '@/router/index.js';
 import {createVuetify} from 'vuetify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import '@/assets/style.css';
 import '@mdi/font/css/materialdesignicons.css';
 import 'vuetify/styles';
 import * as components from 'vuetify/components';
