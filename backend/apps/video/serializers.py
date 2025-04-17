@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from video import models as video_models
-from core import serializers_fields
+from apps.video import models as video_models
+from apps.core import serializers_fields
 
 
 class VideoSerializer(serializers.ModelSerializer):

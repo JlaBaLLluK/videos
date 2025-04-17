@@ -6,8 +6,8 @@ from rest_framework import serializers
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt import serializers as jwt_serializer
 
-from core import serializers_fields
-from core import mixins
+from . import serializers_fields
+from . import mixins
 
 User = get_user_model()
 

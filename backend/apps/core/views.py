@@ -1,5 +1,3 @@
-from pickle import FALSE
-
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,11 +6,11 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_200_OK
 
-from core.authentication import JwtAuthenticationNoException
-from core import models
-from core import serializers
-from core import permissions
-from core import mixins
+from .authentication import JwtAuthenticationNoException
+from . import models
+from . import serializers
+from . import permissions
+from . import mixins
 
 
 @extend_schema_view(

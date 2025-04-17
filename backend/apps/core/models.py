@@ -2,14 +2,14 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from core import mixins as core_mixins
+from . import mixins
 
 
 def profile_photo_upload_to(instance, filename):
     return f"{instance.id}/logo.{filename.split(".")[-1]}"
 
 
-class User(AbstractUser, core_mixins.CreatedUpdatedMixin):
+class User(AbstractUser, mixins.CreatedUpdatedMixin):
     username_validator = RegexValidator(
         regex=r"^[a-zA-Z][a-zA-Z0-9_]*$",
         message="Имя пользователя может содержать буквы латинского алфавита, цифры и символ нижнего подчеркивания.",

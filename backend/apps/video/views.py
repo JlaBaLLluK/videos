@@ -5,10 +5,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from core import permissions as core_permissions
-from core import mixins as core_mixins
-from video import serializers as video_serializers
-from video import models as video_models
+from apps.core import permissions as core_permissions
+from apps.core import mixins as core_mixins
+from apps.video import serializers as video_serializers, models as video_models
 
 
 @extend_schema_view(

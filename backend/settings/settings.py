@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # project apps
-    "core",
-    "video",
+    "apps.core",
+    "apps.video",
     # third-party apps
     "rest_framework",
     "corsheaders",

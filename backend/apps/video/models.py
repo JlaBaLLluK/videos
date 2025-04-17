@@ -1,10 +1,12 @@
 from django.db import models
 
-from core import mixins as core_mixins
+from apps.core import mixins as core_mixins
 
 
 def video_upload_to(instance, filename):
-    return f"USER_{instance.author.id}/VIDEO_{instance.id}/video.{filename.split(".")[-1]}"
+    return (
+        f"USER_{instance.author.id}/VIDEO_{instance.id}/video.{filename.split(".")[-1]}"
+    )
 
 
 def video_preview_upload_to(instance, filename):

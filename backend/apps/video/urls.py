@@ -1,8 +1,8 @@
 from rest_framework.routers import SimpleRouter
 
-from video.views import *
+from . import views
 
 router = SimpleRouter()
-router.register("video", VideoViewSet)
+router.register("video", views.VideoViewSet)
 
 urlpatterns = router.urls
