@@ -82,8 +82,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
             subject="Подтверждение аккаунта",
             from_email=settings.DEFAULT_FROM_EMAIL,
             message=f"Код для подтверждения регистрации - {confirmation_code}",
-            recipient_list=[self.instance.email,],
-            fail_silently=False
+            recipient_list=[
+                self.instance.email,
+            ],
+            fail_silently=False,
         )
 
     def create(self, validated_data):
