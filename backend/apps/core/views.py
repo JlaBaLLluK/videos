@@ -30,7 +30,7 @@ class ModelViewSet(
     destroy=extend_schema(description="User delete"),
 )
 @extend_schema(tags=["User"])
-class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
+class UserViewSet(ModelViewSet):
     queryset = models.User.objects.filter()
     serializer_class = serializers.UserListSerializer
     actions_serializers_map = {
@@ -39,6 +39,7 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         "retrieve": serializers.UserDetailSerializer,
         "update": serializers.UserUpdateSerializer,
         "partial_update": serializers.UserUpdateSerializer,
+        "registration_confirm": serializers.UserRegistrationConfirmSerializer,
         "me": serializers.UserDetailSerializer,
         "update_password": serializers.UpdatePasswordSerializer,
         "subscribers": serializer_class,
@@ -54,6 +55,7 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         "subscribers": [IsAuthenticated],
         "subscriptions": [IsAuthenticated],
     }
+    authentication_classes = []
     file_fields_and_functions = {"profile_photo": models.profile_photo_upload_to}
     lookup_field = "username"
 
@@ -64,6 +66,13 @@ class UserViewSet(mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             self.authentication_classes = [JwtAuthenticationNoException]
 
         return super().get_authenticators()
+
+    @action(methods=["PATCH"], detail=False, url_path="registration-confirm")
+    def registration_confirm(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"success": "Регистрация завершена успешно"}, HTTP_200_OK)
 
     def perform_update(self, serializer):
         instance = self.get_object()

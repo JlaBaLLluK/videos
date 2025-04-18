@@ -1,7 +1,11 @@
 from typing import Dict, Any
 
+import random
+
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt import serializers as jwt_serializer
@@ -70,10 +74,41 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         return super().validate(attrs)
 
+    def send_email(self):
+        confirmation_code = random.randint(100_000, 999_999)
+        self.context["request"].session["confirmation_code"] = str(confirmation_code)
+        self.context["request"].session["user"] = self.instance
+        send_mail(
+            subject="Подтверждение аккаунта",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            message=f"Код для подтверждения регистрации - {confirmation_code}",
+            recipient_list=[self.instance.email,],
+            fail_silently=False
+        )
+
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = User(**validated_data)
+        user.is_active = False
         user.set_password(password)
+        user.save()
+        self.instance = user
+        self.send_email()
+        return user
+
+
+class UserRegistrationConfirmSerializer(serializers.Serializer):
+    confirmation_code = serializers.CharField()
+
+    def validate_confirmation_code(self, value):
+        if self.context["request"].session["confirmation_code"] != value:
+            raise serializers.ValidationError("Неверный код.")
+
+        return value
+
+    def save(self, **kwargs):
+        user = self.context["request"].session["user"]
+        user.is_active = True
         user.save()
         return user
 

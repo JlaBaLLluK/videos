@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from environ import environ
 from .api_settings import *  # noqa
 
@@ -126,3 +127,11 @@ AUTH_USER_MODEL = "core.User"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@example.com"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = ""
+# EMAIL_HOST_USER = ""
+# EMAIL_HOST_PASSWORD = ""

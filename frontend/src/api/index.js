@@ -12,6 +12,7 @@ export async function refreshToken() {
 export async function userRegistration(credentials) {
   try {
     const response = await baseAPI.post('core/users/', credentials);
+    localStorage.setItem('allow_visit_confirmation_page', 'allowed');
     return {
       data: response.data,
       status: response.status
