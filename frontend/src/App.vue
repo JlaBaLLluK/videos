@@ -11,7 +11,7 @@ const isAuthenticated = ref(!!user.value);
 const isMenuOpened = ref(false);
 const isSidebarCollapsed = ref(false);
 
-const showSidebar = computed(() => !['registration', 'login'].includes(route.name));
+const showSidebar = computed(() => !['registration', 'login', 'registrationConfirm'].includes(route.name));
 const collapseSidebarIcon = computed(() => isSidebarCollapsed.value ? 'mdi-arrow-right' : 'mdi-arrow-left');
 
 function userLoginEventHandler() {
@@ -132,7 +132,7 @@ onUnmounted(() => {
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <div class="ma-6">
+        <div class="ma-6 h-100">
           <router-view :key="$route.fullPath" />
         </div>
       </v-main>

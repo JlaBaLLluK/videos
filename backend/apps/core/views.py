@@ -51,16 +51,19 @@ class UserViewSet(ModelViewSet):
     ]
     actions_permissions_map = {
         "create": [],
+        "registration_confirm": [],
         "subscribe": [IsAuthenticated],
         "subscribers": [IsAuthenticated],
         "subscriptions": [IsAuthenticated],
     }
     authentication_classes = []
-    file_fields_and_functions = {"profile_photo": models.profile_photo_upload_to}
     lookup_field = "username"
 
     def get_authenticators(self):
-        if self.request.method in ["PATCH", "PUT"]:
+        act = self.request.resolver_match.view_name
+        if act == "user-registration-confirm":
+            self.authentication_classes = []
+        elif self.request.method in ["PUT", "PATCH"]:
             self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
         elif self.request.method == "GET":
             self.authentication_classes = [JwtAuthenticationNoException]
@@ -68,11 +71,11 @@ class UserViewSet(ModelViewSet):
         return super().get_authenticators()
 
     @action(methods=["PATCH"], detail=False, url_path="registration-confirm")
-    def registration_confirm(self, request):
+    def registration_confirm(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"success": "Регистрация завершена успешно"}, HTTP_200_OK)
+        return Response({"message": "Регистрация завершена успешно."}, HTTP_200_OK)
 
     def perform_update(self, serializer):
         instance = self.get_object()

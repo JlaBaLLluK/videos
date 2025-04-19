@@ -59,10 +59,18 @@ class UserListSerializer(mixins.UserSerializerMixin, serializers.ModelSerializer
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers_fields.PasswordField()
     password_confirm = serializers_fields.PasswordField()
+    confirmation_code = serializers.CharField(read_only=True)
+    _confirmation_code = None
 
     class Meta:
         model = User
-        fields = ("username", "email", "password", "password_confirm")
+        fields = (
+            "username",
+            "email",
+            "password",
+            "password_confirm",
+            "confirmation_code",
+        )
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
         password = attrs.get("password")
@@ -72,16 +80,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 {"password_confirm": "Пароли не совпадают."}
             )
 
+        attrs["confirmation_code"] = str(random.randint(100_000, 999_999))
         return super().validate(attrs)
 
-    def send_email(self):
-        confirmation_code = random.randint(100_000, 999_999)
-        self.context["request"].session["confirmation_code"] = str(confirmation_code)
-        self.context["request"].session["user"] = self.instance
+    def send_email(self, code):
         send_mail(
-            subject="Подтверждение аккаунта",
+            subject="Подтверждение регистрации",
             from_email=settings.DEFAULT_FROM_EMAIL,
-            message=f"Код для подтверждения регистрации - {confirmation_code}",
+            message=f"Код для подтверждения регистрации - {code}",
             recipient_list=[
                 self.instance.email,
             ],
@@ -90,26 +96,27 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+        code = validated_data.pop("confirmation_code")
         user = User(**validated_data)
+        self._confirmation_code = code
         user.is_active = False
         user.set_password(password)
         user.save()
         self.instance = user
-        self.send_email()
+        self.send_email(code)
         return user
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["confirmation_code"] = self._confirmation_code
+        return data
 
 
 class UserRegistrationConfirmSerializer(serializers.Serializer):
-    confirmation_code = serializers.CharField()
-
-    def validate_confirmation_code(self, value):
-        if self.context["request"].session["confirmation_code"] != value:
-            raise serializers.ValidationError("Неверный код.")
-
-        return value
+    username = serializers.CharField()
 
     def save(self, **kwargs):
-        user = self.context["request"].session["user"]
+        user = User.objects.get(username=self.validated_data["username"])
         user.is_active = True
         user.save()
         return user

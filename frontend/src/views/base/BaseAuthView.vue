@@ -3,12 +3,12 @@ import {useRoute, useRouter} from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
-const isRegistrationActive = route.name === 'registration';
+const isRegistrationActive = ['registration', 'registrationConfirm'].includes(route.name);
 
 </script>
 
 <template>
-  <div class="d-flex justify-center align-center" style="height: 75vh">
+  <div class="d-flex justify-center align-center h-75">
     <div class="p-5 border rounded shadow">
       <div class="d-flex justify-center gap-3" style="cursor: pointer; font-size: 22px;">
         <div class="px-3" :class="{ active: !isRegistrationActive }" @click="router.push({ name: 'login' })">

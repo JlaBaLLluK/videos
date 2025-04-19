@@ -4,6 +4,7 @@ import {ref} from 'vue';
 import {userRegistration} from '@/api/index.js';
 import {useRouter} from 'vue-router';
 import PasswordField from '@/components/PasswordField.vue';
+import {infoToast} from '@/plugins/toasts.js';
 
 const form = ref({
   username: '',
@@ -12,8 +13,6 @@ const form = ref({
   password_confirm: ''
 });
 const formErrors = ref({});
-const passwordShown = ref(false);
-const confirmPasswordShow = ref(false);
 
 const router = useRouter();
 
@@ -22,7 +21,9 @@ async function submit() {
   if (response.status === 400) {
     formErrors.value = response.data;
   } else {
-    await router.push({name: 'login'});
+    localStorage.setItem('registeredUserData', JSON.stringify(response.data));
+    await router.push({name: 'registrationConfirm'});
+    infoToast('Введите код, отправленный на указанный вами адрес электронный почты.');
   }
 }
 

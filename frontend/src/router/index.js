@@ -13,8 +13,18 @@ const routes = [
   },
   {
     path: '/registration',
-    name: 'registration',
-    component: () => import('@/views/auth/RegistrationView.vue'),
+    children: [
+      {
+        path: '',
+        name: 'registration',
+        component: () => import('@/views/auth/RegistrationView.vue'),
+      },
+      {
+        path: 'confirm',
+        name: 'registrationConfirm',
+        component: () => import('@/views/auth/RegistrationConfirmationView.vue'),
+      }
+    ]
   },
   {
     path: '/login',
@@ -48,6 +58,12 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes: routes
+});
+
+router.beforeEach(async(to) => {
+  if (to.name === 'registrationConfirm' && !localStorage.getItem('registeredUserData')) {
+    await router.push({name: 'notFound'});
+  }
 });
 
 export default router;
