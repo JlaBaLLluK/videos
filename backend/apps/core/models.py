@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import AbstractUser
 
 from . import mixins
@@ -28,6 +29,17 @@ class User(AbstractUser, mixins.CreatedUpdatedMixin):
     subscriptions = models.ManyToManyField(
         "self", symmetrical=False, related_name="subscribers"
     )
+
+    def validate_unique(self, exclude=...):
+        try:
+            user = User.objects.get(
+                Q(Q(username=self.username) | Q(email=self.email)) & Q(is_active=False)
+            )
+            user.delete()
+        except User.DoesNotExist:
+            pass
+        finally:
+            super().validate_unique(exclude=exclude)
 
     @property
     def channel_name(self) -> str:
