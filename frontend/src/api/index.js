@@ -50,6 +50,26 @@ export async function userLogin(credentials) {
   }
 }
 
+export async function userDelete(username, password) {
+  console.log(password);
+  try {
+    const response = await baseAPI.delete(`core/users/${username}/`, {
+      params: {
+        password: password,
+      }
+    });
+    return {
+      data: response.data,
+      status: response.status
+    };
+  } catch (error) {
+    return {
+      data: error.response.data,
+      status: error.response.status
+    };
+  }
+}
+
 export async function getMe() {
   const response = await baseAPI.get('core/users/me');
   localStorage.setItem('user', JSON.stringify(response.data));

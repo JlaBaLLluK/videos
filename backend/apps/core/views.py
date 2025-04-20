@@ -39,6 +39,7 @@ class UserViewSet(ModelViewSet):
         "retrieve": serializers.UserDetailSerializer,
         "update": serializers.UserUpdateSerializer,
         "partial_update": serializers.UserUpdateSerializer,
+        "destroy": serializers.UserDeleteSerializer,
         "registration_confirm": serializers.UserRegistrationConfirmSerializer,
         "me": serializers.UserDetailSerializer,
         "update_password": serializers.UpdatePasswordSerializer,
@@ -67,6 +68,8 @@ class UserViewSet(ModelViewSet):
             self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
         elif self.request.method == "GET":
             self.authentication_classes = [JwtAuthenticationNoException]
+        elif self.request.method == "DELETE":
+            self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
 
         return super().get_authenticators()
 
@@ -81,6 +84,13 @@ class UserViewSet(ModelViewSet):
         instance = self.get_object()
         instance.profile_photo.delete(save=False)
         super().perform_update(serializer)
+
+    def destroy(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data={"password": request.query_params.get("password")}
+        )
+        serializer.is_valid(raise_exception=True)
+        return super().destroy(request, *args, **kwargs)
 
     @extend_schema(description="Update user password")
     @action(

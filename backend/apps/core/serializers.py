@@ -179,3 +179,13 @@ class UpdatePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data["new_password"])
         user.save()
         return user
+
+
+class UserDeleteSerializer(serializers.Serializer):
+    password = serializers_fields.PasswordField()
+
+    def validate_password(self, value):
+        if not self.context["request"].user.check_password(value):
+            raise serializers.ValidationError("Неверный пароль.")
+
+        return value
