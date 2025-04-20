@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import string
 
 import random
 
@@ -123,6 +124,22 @@ class ResetPasswordCodeSerializer(
             message=f"Код для сброса пароля - {code}.", subject="Сброс пароля"
         )
         return code
+
+
+class SendPasswordSerializer(mixins.SendEmailSerializerMixin, serializers.Serializer):
+    def save(self, **kwargs):
+        password = "".join(
+            random.sample(
+                string.ascii_letters + string.digits + string.punctuation,
+                random.randint(10, 14),
+            )
+        )
+        self.instance.set_password(password)
+        self.instance.save()
+        self.send_email(
+            message=f"Ваш новый пароль - {password}. Рекомендуется сменить его в профиле.",
+            subject="Новый пароль",
+        )
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

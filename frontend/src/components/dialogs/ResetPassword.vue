@@ -16,7 +16,6 @@ const correctCode = ref('');
 async function submit() {
   if (!displayCodeField.value) {
     const response = await sendResetPasswordCode(username.value);
-    console.log(response);
     if (response.status !== 200) {
       usernameErrors.value = response.data;
       return;

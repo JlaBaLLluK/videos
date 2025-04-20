@@ -46,6 +46,7 @@ class UserViewSet(ModelViewSet):
         "subscribers": serializer_class,
         "subscriptions": serializer_class,
         "send_reset_password_code": serializers.ResetPasswordCodeSerializer,
+        "reset_password": serializers.SendPasswordSerializer,
     }
     permission_classes = [
         permissions.IsUserItself,
@@ -55,6 +56,7 @@ class UserViewSet(ModelViewSet):
         "create": [],
         "registration_confirm": [],
         "send_reset_password_code": [],
+        "reset_password": [],
         "subscribe": [IsAuthenticated],
         "subscribers": [IsAuthenticated],
         "subscriptions": [IsAuthenticated],
@@ -65,6 +67,8 @@ class UserViewSet(ModelViewSet):
     def get_authenticators(self):
         act = self.request.resolver_match.view_name
         if act == "user-registration-confirm":
+            self.authentication_classes = []
+        elif act == "user-reset-password":
             self.authentication_classes = []
         elif self.request.method in ["PUT", "PATCH"]:
             self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
@@ -100,6 +104,13 @@ class UserViewSet(ModelViewSet):
         serializer = self.get_serializer(instance=instance)
         code = serializer.save()
         return Response({"code": code}, HTTP_200_OK)
+
+    @action(methods=["PATCH"], detail=True, url_path="reset-password")
+    def reset_password(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance=instance)
+        serializer.save()
+        return Response()
 
     @extend_schema(description="Update user password")
     @action(
