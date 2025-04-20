@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -83,3 +85,16 @@ class UserSerializerMixin(metaclass=serializers.SerializerMetaclass):
     def get_is_request_user_subscribed(self, instance):
         user = self.context["request"].user
         return user.is_authenticated and user in instance.subscribers.all()
+
+
+class SendEmailSerializerMixin:
+    def send_email(self, message, subject):
+        send_mail(
+            subject=subject,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            message=message,
+            recipient_list=[
+                self.instance.email,
+            ],
+            fail_silently=False,
+        )

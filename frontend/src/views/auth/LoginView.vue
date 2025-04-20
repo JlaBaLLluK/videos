@@ -4,13 +4,14 @@ import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {userLogin} from '@/api/index.js';
 import PasswordField from '@/components/PasswordField.vue';
+import ResetPassword from '@/components/dialogs/ResetPassword.vue';
 
 const form = ref({
   username_or_email: '',
   password: '',
 });
 const formErrors = ref({});
-const passwordShown = ref(false);
+const resetPasswordDialogOpen = ref(false);
 
 const router = useRouter();
 
@@ -51,11 +52,15 @@ async function submit() {
         label="Пароль"
         placeholder="Введите пароль"
       />
+      <p class="cursor-pointer text-center" @click="resetPasswordDialogOpen = true">
+        <u>Забыли пароль?</u>
+      </p>
       <div class="w-100 text-center">
-        <v-btn variant="outlined" type="submit" class="mt-3">Войти</v-btn>
+        <v-btn variant="outlined" type="submit">Войти</v-btn>
       </div>
     </v-form>
   </base-auth-view>
+  <reset-password v-model="resetPasswordDialogOpen" />
 </template>
 
 <style scoped>

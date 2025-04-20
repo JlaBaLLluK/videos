@@ -3,9 +3,7 @@ from typing import Dict, Any
 import random
 
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt import serializers as jwt_serializer
@@ -56,7 +54,9 @@ class UserListSerializer(mixins.UserSerializerMixin, serializers.ModelSerializer
         )
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(
+    mixins.SendEmailSerializerMixin, serializers.ModelSerializer
+):
     password = serializers_fields.PasswordField()
     password_confirm = serializers_fields.PasswordField()
     confirmation_code = serializers.CharField(read_only=True)
@@ -83,17 +83,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         attrs["confirmation_code"] = str(random.randint(100_000, 999_999))
         return super().validate(attrs)
 
-    def send_email(self, code):
-        send_mail(
-            subject="Подтверждение регистрации",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            message=f"Код для подтверждения регистрации - {code}",
-            recipient_list=[
-                self.instance.email,
-            ],
-            fail_silently=False,
-        )
-
     def create(self, validated_data):
         password = validated_data.pop("password")
         code = validated_data.pop("confirmation_code")
@@ -103,7 +92,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         self.instance = user
-        self.send_email(code)
+        self.send_email(
+            subject="Подтверждение регистрации",
+            message=f"Код для подтверждения регистрации - {code}",
+        )
         return user
 
     def to_representation(self, instance):
@@ -120,6 +112,17 @@ class UserRegistrationConfirmSerializer(serializers.Serializer):
         user.is_active = True
         user.save()
         return user
+
+
+class ResetPasswordCodeSerializer(
+    mixins.SendEmailSerializerMixin, serializers.Serializer
+):
+    def save(self, **kwargs):
+        code = str(random.randint(100_000, 999_999))
+        self.send_email(
+            message=f"Код для сброса пароля - {code}.", subject="Сброс пароля"
+        )
+        return code
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

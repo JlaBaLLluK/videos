@@ -45,6 +45,7 @@ class UserViewSet(ModelViewSet):
         "update_password": serializers.UpdatePasswordSerializer,
         "subscribers": serializer_class,
         "subscriptions": serializer_class,
+        "send_reset_password_code": serializers.ResetPasswordCodeSerializer,
     }
     permission_classes = [
         permissions.IsUserItself,
@@ -53,6 +54,7 @@ class UserViewSet(ModelViewSet):
     actions_permissions_map = {
         "create": [],
         "registration_confirm": [],
+        "send_reset_password_code": [],
         "subscribe": [IsAuthenticated],
         "subscribers": [IsAuthenticated],
         "subscriptions": [IsAuthenticated],
@@ -91,6 +93,13 @@ class UserViewSet(ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         return super().destroy(request, *args, **kwargs)
+
+    @action(methods=["GET"], detail=True, url_path="send-reset-password-code")
+    def send_reset_password_code(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance=instance)
+        code = serializer.save()
+        return Response({"code": code}, HTTP_200_OK)
 
     @extend_schema(description="Update user password")
     @action(

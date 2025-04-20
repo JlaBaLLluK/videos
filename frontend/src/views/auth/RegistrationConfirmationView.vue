@@ -35,12 +35,14 @@ async function submit() {
         placeholder="Введите код подтверждения"
         class="mt-5"
         :error-messages="error"
+        variant="outlined"
+        density="compact"
       />
       <v-btn
         variant="outlined"
         type="submit"
         text="Подтвердить"
-        class="w-100 mt-3"
+        class="w-100 mt-2"
       />
     </v-form>
   </base-auth-view>

@@ -50,6 +50,25 @@ export async function userLogin(credentials) {
   }
 }
 
+export async function sendResetPasswordCode(username) {
+  try {
+    const response = await baseAPI.get(`core/users/${username}/send-reset-password-code/`);
+    return {
+      data: response.data,
+      status: response.status
+    };
+  } catch (error) {
+    return {
+      data: error.response.data,
+      status: error.response.status
+    };
+  }
+}
+
+export async function resetPassword(username) {
+  await baseAPI.patch(`core/users/${username}/reset-password/`);
+}
+
 export async function userDelete(username, password) {
   console.log(password);
   try {
