@@ -82,14 +82,14 @@ onUnmounted(() => {
       <p class="mt-3 text-justify fs-5">
         {{ user?.description_preview }}
       </p>
-      <div v-if="$route.name !== 'profileUpdate'" class="mt-n5">
+      <div v-if="!['profileUpdate', 'videoUpload'].includes($route.name)" class="mt-n5">
         <b class="cursor-pointer" @click="detailDialogOpen=true">Ещё</b>
       </div>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
         <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
           Настроить информацию
         </v-btn>
-        <v-btn variant="outlined">Управление видео</v-btn>
+        <v-btn variant="outlined" @click="$router.push({name: 'videoUpload'})">Загрузить видео</v-btn>
       </div>
     </div>
     <div class="mt-5 w-100">

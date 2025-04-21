@@ -10,10 +10,17 @@ class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = video_models.Video
         fields = "__all__"
+        extra_kwargs = {
+            "video": {
+                "error_messages": {
+                    "required": "Видео не выбрано",
+                }
+            }
+        }
 
     def get_fields(self):
         fields = super().get_fields()
-        fields["watches_count"].read_only = True
+        fields["views_count"].read_only = True
         fields["likes_count"].read_only = True
         fields["dislikes_count"].read_only = True
         return fields

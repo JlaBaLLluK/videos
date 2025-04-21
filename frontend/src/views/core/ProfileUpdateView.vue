@@ -1,13 +1,14 @@
 <script setup>
-import {onMounted, ref, watch} from 'vue';
+import {onBeforeMount, onMounted, ref, watch} from 'vue';
 import {updateUserData} from '@/api/index.js';
-import {useRouter} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import UpdatePassword from '@/components/dialogs/UpdatePassword.vue';
 import DeleteAccount from '@/components/dialogs/DeleteAccount.vue';
 
 const emits = defineEmits(['profilePhotoChanged']);
 
 const router = useRouter();
+const route = useRoute();
 
 const user = JSON.parse(localStorage.getItem('user'));
 
@@ -39,6 +40,12 @@ watch(
     emits('profilePhotoChanged', file);
   }
 );
+
+onBeforeMount(() => {
+  if (route.params.username !== JSON.parse(localStorage.getItem('user')).username) {
+    router.push({name: 'profile', params: {username: route.params.username}});
+  }
+});
 
 onMounted(async () => {
   if (user.profile_photo) {
@@ -118,13 +125,3 @@ onMounted(async () => {
   <update-password v-model="updatePasswordDialogOpen" />
   <delete-account v-model="deleteAccountDialogOpen" />
 </template>
-
-<style scoped>
-:deep(.v-label) {
-  font-size: 18px;
-}
-
-:deep(.v-messages__message) {
-  font-size: 16px;
-}
-</style>

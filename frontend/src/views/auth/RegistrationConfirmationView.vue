@@ -53,12 +53,4 @@ async function submit() {
   min-width: 300px;
 }
 
-:deep(.v-label) {
-  font-size: 18px;
-}
-
-:deep(.v-messages__message) {
-  font-size: 16px;
-}
-
 </style>

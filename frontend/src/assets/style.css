@@ -18,3 +18,11 @@
     background-color: lightgreen;
     box-shadow: 0 0 4px 0 #7fef7f;
 }
+
+.v-form .v-label {
+  font-size: 18px !important;
+}
+
+.v-form .v-messages__message {
+  font-size: 16px !important;
+}

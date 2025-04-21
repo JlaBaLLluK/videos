@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS = [
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://192.168.0.102:5173",
 ]
 
 REST_FRAMEWORK = {

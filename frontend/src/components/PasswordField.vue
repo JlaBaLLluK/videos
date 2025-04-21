@@ -21,7 +21,3 @@ const passwordShown = ref(false);
     @click:append-inner="passwordShown = !passwordShown"
   />
 </template>
-
-<style scoped>
-
-</style>

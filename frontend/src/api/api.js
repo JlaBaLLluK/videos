@@ -3,13 +3,14 @@ import router from '@/router/index.js';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import {errorToast} from '@/plugins/toasts.js';
 
+const backendHost = import.meta.env.VITE_API_URL;
 const baseAPI = axios.create({
-  baseURL: 'http://localhost:8000/api/v1/',
+  baseURL: `http://${backendHost}/api/v1/`,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-  }
+  },
 });
 
 async function refreshLogic(failedRequest) {
@@ -18,7 +19,7 @@ async function refreshLogic(failedRequest) {
   }
   try {
     const response = await axios.post(
-      'http://localhost:8000/api/v1/auth/refresh-token/',
+      `http://${backendHost}/api/v1/auth/refresh-token/`,
       {refresh: localStorage.getItem('refreshToken')},
     );
     const {access, refresh} = response.data;

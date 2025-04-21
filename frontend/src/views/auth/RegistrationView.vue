@@ -74,14 +74,6 @@ async function submit() {
   min-width: 400px;
 }
 
-:deep(.v-label) {
-  font-size: 18px;
-}
-
-:deep(.v-messages__message) {
-  font-size: 16px;
-}
-
 button {
   width: 400px;
   min-height: 45px;
