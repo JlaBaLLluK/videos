@@ -157,6 +157,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             "profile_photo",
         )
 
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        if "profile_photo" not in data:
+            data["profile_photo"] = ""
+
+        return data
+
 
 class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
     created_at = serializers.DateTimeField(format=api_settings.DATE_FORMAT)

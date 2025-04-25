@@ -1,22 +1,35 @@
 from rest_framework import serializers
 
-from apps.video import models as video_models
+from . import models
 from apps.core import serializers_fields
 
 
-class VideoSerializer(serializers.ModelSerializer):
-    author = serializers_fields.UserReadOnlyField()
-
+class VideoCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = video_models.Video
-        fields = "__all__"
+        model = models.Video
+        fields = ("title", "description", "preview", "video")
         extra_kwargs = {
             "video": {
                 "error_messages": {
-                    "required": "Видео не выбрано",
+                    "required": "Видео не выбрано.",
                 }
             }
         }
+
+
+class VideosListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Video
+        fields = ("id", "title", "preview", "views_count")
+
+
+class VideoDetailSerializer(serializers.ModelSerializer):
+    author = serializers_fields.UserReadOnlyField()
+
+    class Meta:
+        model = models.Video
+        fields = "__all__"
+
 
     def get_fields(self):
         fields = super().get_fields()
@@ -28,11 +41,11 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class WatchesHistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = video_models.ViewsHistory
+        model = models.ViewsHistory
         fields = ("user", "video")
 
 
 class LikesHistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = video_models.LikesHistory
+        model = models.LikesHistory
         fields = ("user", "video")

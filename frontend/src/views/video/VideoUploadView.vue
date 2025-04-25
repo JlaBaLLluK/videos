@@ -3,6 +3,8 @@ import {onBeforeMount, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import baseAPI from '@/api/api.js';
 import {successToast} from '@/plugins/toasts.js';
+import {getMe} from '@/api/index.js';
+import VideoForm from '@/components/video/VideoForm.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -14,11 +16,11 @@ const form = ref({
   video: null,
 });
 const errors = ref({});
-const uploadProgress = ref(-1);
+const uploadProgress = ref(0);
 
 async function submit() {
   try {
-    uploadProgress.value = 0;
+    errors.value = null;
     await baseAPI.post('video/videos/', form.value, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -28,6 +30,7 @@ async function submit() {
       },
     });
     successToast('Видео загружено успешно.');
+    await getMe();
     await router.push({name: 'profile'});
   } catch (error) {
     errors.value = error.response.data;
@@ -44,38 +47,15 @@ onBeforeMount(() => {
 <template>
   <div class="w-50">
     <v-form @submit.prevent="submit">
-      <v-text-field
-        v-model="form.title"
-        variant="outlined"
-        density="compact"
-        label="Название видео"
-        placeholder="Введите название видео"
-        :error-messages="errors.title"
-      />
-      <v-textarea
-        v-model="form.description"
-        class="mt-3"
-        variant="outlined"
-        density="compact"
-        label="Описание видео"
-        placeholder="Введите описание видео"
-        :error-messages="errors.description"
-      />
-      <v-file-input
-        v-model="form.preview"
-        label="Выберите превью видео"
-        :error-messages="errors.preview"
-      />
-      <v-file-input
-        v-model="form.video"
-        label="Выберите видео"
-        :error-messages="errors.video"
-      />
-      <v-progress-linear
-        v-if="uploadProgress > -1"
-        v-model="uploadProgress"
-        height="8"
-      />
+      <video-form v-model="form" :errors="errors">
+        <template #uploadProgress>
+          <v-progress-linear
+            v-if="!errors"
+            v-model="uploadProgress"
+            height="8"
+          />
+        </template>
+      </video-form>
       <div class="d-flex w-100 justify-center ga-3">
         <v-btn
           variant="outlined"

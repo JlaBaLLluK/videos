@@ -1,13 +1,13 @@
 from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.core import permissions as core_permissions
 from apps.core import mixins as core_mixins
-from apps.video import serializers as video_serializers, models as video_models
+from apps.core.views import ModelViewSet
+from . import serializers, models
 
 
 @extend_schema_view(
@@ -19,18 +19,23 @@ from apps.video import serializers as video_serializers, models as video_models
     destroy=extend_schema(description="Video delete"),
 )
 @extend_schema(tags=["Video"])
-class VideoViewSet(
-    core_mixins.CreateObjectWithIdInFilePathMixin, viewsets.ModelViewSet
-):
-    queryset = video_models.Video.objects.all()
-    serializer_class = video_serializers.VideoSerializer
+class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
+    queryset = models.Video.objects.all()
+    serializer_class = serializers.VideoCreateSerializer
+    actions_serializers_map = {
+        "list": serializers.VideosListSerializer,
+        "retrieve": serializers.VideoDetailSerializer,
+        "watched_by_user": serializers.VideosListSerializer,
+        "liked_by_user": serializers.VideosListSerializer,
+        "user_videos": serializers.VideosListSerializer,
+    }
     permission_classes = [
         IsAuthenticatedOrReadOnly,
         core_permissions.IsObjectOwnerOrReadonly,
     ]
     file_fields_and_functions = {
-        "video": video_models.video_upload_to,
-        "preview": video_models.video_preview_upload_to,
+        "video": models.video_upload_to,
+        "preview": models.video_preview_upload_to,
     }
     creator_field = "author"
 
@@ -55,7 +60,7 @@ class VideoViewSet(
     def like(self, request, *args, **kwargs):
         video = self.get_object()
         try:
-            video_models.LikesHistory.objects.create(
+            models.LikesHistory.objects.create(
                 video=video, user=request.user
             )  # 'add' method doesn't throw an exception
             response_message = "Set like"
@@ -81,7 +86,7 @@ class VideoViewSet(
     def dislike(self, request, *args, **kwargs):
         video = self.get_object()
         try:
-            video_models.DislikesHistory.objects.create(
+            models.DislikesHistory.objects.create(
                 video=video, user=request.user
             )  # 'add' method doesn't throw an exception
             response_message = "Set dislike"
@@ -102,7 +107,7 @@ class VideoViewSet(
     @action(
         methods=["GET"],
         detail=False,
-        url_path="my/watched",
+        url_path="my-watched",
         permission_classes=[IsAuthenticated],
     )
     def watched_by_user(self, request):
@@ -115,7 +120,7 @@ class VideoViewSet(
     @action(
         methods=["GET"],
         detail=False,
-        url_path="my/liked",
+        url_path="my-liked",
         permission_classes=[IsAuthenticated],
     )
     def liked_by_user(self, request):
@@ -128,7 +133,7 @@ class VideoViewSet(
     @action(
         methods=["GET"],
         detail=False,
-        url_path="my/videos",
+        url_path="my-published",
         permission_classes=[IsAuthenticated],
     )
     def user_videos(self, request):

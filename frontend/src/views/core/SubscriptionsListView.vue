@@ -1,12 +1,12 @@
 <script setup>
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {getUsersList} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 import UsersList from '@/components/UsersList.vue';
 
 const loading = ref(true);
 const items = ref([]);
-const haveDataText = ref('');
+const haveDataText = computed(() => `Ваши подписки (${items.value.length}):`);
 
 function subscribeClicked(username) {
   const itemIndex = items.value.indexOf(items.value.find((item) => item.username === username));
@@ -16,7 +16,6 @@ function subscribeClicked(username) {
 onMounted(async () => {
   const {data} = await getUsersList('core/users/subscriptions/');
   items.value = data;
-  haveDataText.value = `Ваши подписки (${items.value.length}):`;
   loading.value = false;
 });
 </script>

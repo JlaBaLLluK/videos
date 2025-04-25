@@ -4,10 +4,10 @@ defineProps({
     type: Number,
     default: 150
   },
-  profilePhoto: {
+  photo: {
     required: true,
   },
-  username: {
+  textPlaceholder: {
     type: String,
     required: true,
   }
@@ -17,8 +17,8 @@ defineProps({
 
 <template>
   <v-avatar :size="size" rounded="lg">
-    <v-img v-if="profilePhoto" :src="profilePhoto" />
-    <span v-else class="default-photo fs-1">{{ username[0].toUpperCase() }}</span>
+    <v-img v-if="photo" :src="photo" />
+    <span v-else class="default-photo fs-1">{{ textPlaceholder[0].toUpperCase() }}</span>
   </v-avatar>
 </template>
 

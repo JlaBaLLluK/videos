@@ -1,5 +1,5 @@
 <script setup>
-import ProfileAvatar from '@/components/ProfileAvatar.vue';
+import ProfileAvatar from '@/components/PhotoWithDefault.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 
 defineProps({
@@ -43,8 +43,8 @@ function removeElement(username) {
           >
             <profile-avatar
               :size="65"
-              :username="item.username"
-              :profile-photo="item.profile_photo"
+              :text-placeholder="item.channel_name"
+              :photo="item.profile_photo"
             />
             <div class="d-flex flex-column">
               <span style="font-size: 1.1rem">{{ item?.channel_name || username }}</span>

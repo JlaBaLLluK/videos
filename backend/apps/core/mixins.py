@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 
 class ActionsSerializersMapMixin:
-    actions_serializers_map: dict
+    actions_serializers_map = {}
 
     def get_serializer_class(self):
         return (
@@ -19,7 +19,7 @@ class ActionsSerializersMapMixin:
 
 
 class ActionsPermissionsMapMixin:
-    actions_permissions_map: dict
+    actions_permissions_map = {}
 
     def get_permissions(self):
         if self.action in self.actions_permissions_map:
@@ -65,8 +65,9 @@ class CreateObjectWithIdInFilePathMixin:
             file_content = ContentFile(file_field.read())
             file_path = filename_function(instance, file_field.name)
             setattr(instance, file_field_name, file_path)
-            instance.save()
             default_storage.save(file_path, file_content)
+
+        instance.save()
 
 
 class UserSerializerMixin(metaclass=serializers.SerializerMetaclass):

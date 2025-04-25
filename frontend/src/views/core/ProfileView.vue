@@ -3,7 +3,7 @@ import {onMounted, onUnmounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import {getUserData} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
-import ProfileAvatar from '@/components/ProfileAvatar.vue';
+import ProfileAvatar from '@/components/PhotoWithDefault.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import UserDetail from '@/components/dialogs/UserDetail.vue';
 
@@ -51,8 +51,8 @@ onUnmounted(() => {
     <div class="d-flex justify-start">
       <div class="d-flex justify-space-between align-center ga-5">
         <profile-avatar
-          :profile-photo="profilePhoto"
-          :username="username"
+          :photo="profilePhoto"
+          :text-placeholder="username"
         />
         <div class="d-flex flex-column">
           <span class="fs-3">{{ user?.channel_name || username }}</span>

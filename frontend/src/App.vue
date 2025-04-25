@@ -101,7 +101,7 @@ onUnmounted(() => {
               <v-list-item-title>Плейлисты</v-list-item-title>
             </div>
           </v-list-item>
-          <v-list-item link>
+          <v-list-item link :to="{name: 'publishedVideos'}">
             <div class="d-flex ga-3">
               <v-icon>mdi-play-box-multiple-outline</v-icon>
               <v-list-item-title>Ваши видео</v-list-item-title>
@@ -132,7 +132,7 @@ onUnmounted(() => {
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <div class="ma-6 h-100">
+        <div class="ma-10 h-100">
           <router-view :key="$route.fullPath" />
         </div>
       </v-main>
