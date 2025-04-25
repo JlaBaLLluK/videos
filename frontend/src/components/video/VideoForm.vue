@@ -24,13 +24,9 @@ const form = defineModel();
   />
   <v-file-input
     v-model="form.preview"
+    class="mt-3"
     label="Выберите превью видео"
     :error-messages="errors?.preview"
   />
-  <v-file-input
-    v-model="form.video"
-    label="Выберите видео"
-    :error-messages="errors?.video"
-  />
-  <slot name="uploadProgress"></slot>
+  <slot></slot>
 </template>

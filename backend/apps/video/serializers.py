@@ -2,12 +2,23 @@ from rest_framework import serializers
 
 from . import models
 from apps.core import serializers_fields
+from apps.core import mixins as core_mixins
 
 
-class VideoCreateSerializer(serializers.ModelSerializer):
+class VideoEditSerializer(
+    core_mixins.SetEmptyFileSerializerMixin, serializers.ModelSerializer
+):
+    file_fields = ["preview"]
+
     class Meta:
         model = models.Video
-        fields = ("title", "description", "preview", "video")
+        fields = ("title", "description", "preview")
+
+
+class VideoCreateSerializer(VideoEditSerializer):
+    class Meta(VideoEditSerializer.Meta):
+        model = models.Video
+        fields = VideoEditSerializer.Meta.fields + ("video",)
         extra_kwargs = {
             "video": {
                 "error_messages": {
@@ -29,7 +40,6 @@ class VideoDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Video
         fields = "__all__"
-
 
     def get_fields(self):
         fields = super().get_fields()

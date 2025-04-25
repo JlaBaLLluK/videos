@@ -25,6 +25,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     actions_serializers_map = {
         "list": serializers.VideosListSerializer,
         "retrieve": serializers.VideoDetailSerializer,
+        "partial_update": serializers.VideoEditSerializer,
         "watched_by_user": serializers.VideosListSerializer,
         "liked_by_user": serializers.VideosListSerializer,
         "user_videos": serializers.VideosListSerializer,
@@ -41,15 +42,24 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         video = self.get_object()
+        if request.query_params.get("isInitialReceive"):
+            serializer = self.actions_serializers_map["partial_update"](instance=video)
+            return Response(serializer.data)
+
         if (
             request.user.is_authenticated
             and request.user not in video.users_watched_video.all()
         ):
             video.users_watched_video.add(request.user)
-            video.watches_count += 1
+            video.views_count += 1
             video.save()
 
         return super().retrieve(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        instance.preview.delete(save=False)
+        super().perform_update(serializer)
 
     @extend_schema(description="Like video by user")
     @action(
@@ -138,6 +148,6 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     )
     def user_videos(self, request):
         serializer = self.get_serializer(
-            instance=request.user.uploaded_videos.all(), many=True
+            instance=request.user.uploaded_videos.order_by("-updated_at"), many=True
         )
         return Response(serializer.data)

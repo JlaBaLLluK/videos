@@ -99,3 +99,15 @@ class SendEmailSerializerMixin:
             ],
             fail_silently=False,
         )
+
+
+class SetEmptyFileSerializerMixin:
+    file_fields = []
+
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        for file_field in self.file_fields:
+            if file_field not in data:
+                data[file_field] = ""
+
+        return data

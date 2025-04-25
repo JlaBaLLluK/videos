@@ -145,7 +145,11 @@ class SendPasswordSerializer(mixins.SendEmailSerializerMixin, serializers.Serial
         )
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class UserUpdateSerializer(
+    mixins.SetEmptyFileSerializerMixin, serializers.ModelSerializer
+):
+    file_fields = ["profile_photo"]
+
     class Meta:
         model = User
         fields = (
@@ -156,13 +160,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             "description",
             "profile_photo",
         )
-
-    def to_internal_value(self, data):
-        data = super().to_internal_value(data)
-        if "profile_photo" not in data:
-            data["profile_photo"] = ""
-
-        return data
 
 
 class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):

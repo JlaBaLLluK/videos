@@ -30,7 +30,7 @@ onMounted(async () => {
       no-data-text="Вы пока не опубликовали ни одного видео."
       :have-data-text="haveVideosText"
     >
-      <template #actions>
+      <template #actions="{videoId}">
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn icon v-bind="props" variant="plain">
@@ -38,7 +38,7 @@ onMounted(async () => {
             </v-btn>
           </template>
           <v-list>
-            <v-list-item link>
+            <v-list-item link :to="{name: 'videoEdit', params: {id: videoId}}">
               <div class="d-flex ga-3">
                 <v-icon>mdi-pencil-outline</v-icon>
                 <v-list-item-title>Редактировать</v-list-item-title>
@@ -47,7 +47,7 @@ onMounted(async () => {
             <v-list-item
               link
               class="text-danger ga-0"
-              @click="handleDelete(video.id)"
+              @click="handleDelete(videoId)"
             >
               <div class="d-flex ga-3">
                 <v-icon>mdi-delete-outline</v-icon>

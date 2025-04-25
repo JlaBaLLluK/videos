@@ -132,7 +132,7 @@ onUnmounted(() => {
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <div class="ma-10 h-100">
+        <div class="ma-6 h-100">
           <router-view :key="$route.fullPath" />
         </div>
       </v-main>

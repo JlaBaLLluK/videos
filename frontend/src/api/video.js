@@ -16,6 +16,25 @@ export async function getVideos(endpoint) {
   }
 }
 
+export async function editVideo(videoId, data) {
+  try {
+    const response = await baseAPI.patch(`video/videos/${videoId}/`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+    return {
+      data: response.data,
+      status: response.status
+    };
+  } catch (error) {
+    return {
+      status: error.status,
+      data: error.response.data
+    };
+  }
+}
+
 export async function deleteVideo(videoId) {
   await baseAPI.delete(`video/videos/${videoId}/`);
   await getMe();

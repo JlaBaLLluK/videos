@@ -5,6 +5,8 @@ import baseAPI from '@/api/api.js';
 import {successToast} from '@/plugins/toasts.js';
 import {getMe} from '@/api/index.js';
 import VideoForm from '@/components/video/VideoForm.vue';
+import VideoUploadProgress from '@/components/video/VideoUploadProgress.vue';
+import SubmitButton from '@/components/buttons/SubmitButton.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -16,7 +18,7 @@ const form = ref({
   video: null,
 });
 const errors = ref({});
-const uploadProgress = ref(0);
+const uploadProgress = ref(-1);
 
 async function submit() {
   try {
@@ -48,23 +50,16 @@ onBeforeMount(() => {
   <div class="w-50">
     <v-form @submit.prevent="submit">
       <video-form v-model="form" :errors="errors">
-        <template #uploadProgress>
-          <v-progress-linear
-            v-if="!errors"
-            v-model="uploadProgress"
-            height="8"
-          />
-        </template>
+        <v-file-input
+          v-model="form.video"
+          class="mt-3"
+          label="Выберите видео"
+          :error-messages="errors?.video"
+        />
+        <video-upload-progress v-if="!errors && uploadProgress > -1" v-model="uploadProgress" />
       </video-form>
       <div class="d-flex w-100 justify-center ga-3">
-        <v-btn
-          variant="outlined"
-          type="submit"
-          width="200"
-          class="mt-2"
-        >
-          Загрузить
-        </v-btn>
+        <submit-button text="Загрузить" />
       </div>
     </v-form>
   </div>

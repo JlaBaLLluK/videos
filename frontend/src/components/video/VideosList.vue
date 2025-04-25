@@ -39,7 +39,7 @@ const videos = defineModel();
               <span>Просмотров: {{ video.views_count }}</span>
             </div>
           </div>
-          <slot name="actions"></slot>
+          <slot name="actions" :videoId="video.id"></slot>
         </div>
       </v-list-item>
     </v-list>

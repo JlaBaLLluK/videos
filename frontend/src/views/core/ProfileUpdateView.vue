@@ -4,6 +4,8 @@ import {updateUserData} from '@/api/index.js';
 import {useRoute, useRouter} from 'vue-router';
 import UpdatePassword from '@/components/dialogs/UpdatePassword.vue';
 import DeleteAccount from '@/components/dialogs/DeleteAccount.vue';
+import {getFileFromUrl} from '@/utils/imageUtils.js';
+import SubmitButton from '@/components/buttons/SubmitButton.vue';
 
 const emits = defineEmits(['profilePhotoChanged']);
 
@@ -18,7 +20,7 @@ const form = ref({
   last_name: user.last_name,
   first_name: user.first_name,
   description: user.description,
-  profile_photo: null,
+  profile_photo: {},
 });
 const errors = ref({});
 const profilePhotoPreview = ref(null);
@@ -50,10 +52,7 @@ onBeforeMount(() => {
 onMounted(async () => {
   if (user.profile_photo) {
     profilePhotoPreview.value = user.profile_photo;
-    const response = await fetch(user.profile_photo);
-    const fileName = response.url.split('/').pop();
-    const blob = await response.blob();
-    form.value.profile_photo = new File([blob], fileName, { type: blob.type });
+    form.value.profile_photo = await getFileFromUrl(user.profile_photo);
   }
 });
 
@@ -118,7 +117,7 @@ onMounted(async () => {
       <p class="cursor-pointer" style="font-size: 1.1rem" @click="updatePasswordDialogOpen = true"><u>Сменить пароль</u></p>
       <p class="cursor-pointer text-danger" style="font-size: 1.1rem" @click="deleteAccountDialogOpen = true"><u>Удалить аккаунт</u></p>
       <div class="d-flex w-100 justify-center ga-3">
-        <v-btn variant="outlined" type="submit" width="200">Сохранить</v-btn>
+        <submit-button text="Сохранить" />
       </div>
     </v-form>
   </div>
