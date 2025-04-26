@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 
 from . import models
 from apps.core import serializers_fields
@@ -29,9 +30,55 @@ class VideoCreateSerializer(VideoEditSerializer):
 
 
 class VideosListSerializer(serializers.ModelSerializer):
+    published_ago = serializers.SerializerMethodField()
+    author_channel_name = serializers.CharField(source="author.channel_name")
+    author_profile_photo = serializers.ImageField(source="author.profile_photo")
+    author_username = serializers.CharField(source="author.username")
+
     class Meta:
         model = models.Video
-        fields = ("id", "title", "preview", "views_count")
+        fields = (
+            "id",
+            "title",
+            "preview",
+            "views_count",
+            "published_ago",
+            "author_channel_name",
+            "author_profile_photo",
+            "author_username",
+        )
+
+    @staticmethod
+    def get_published_ago(obj):
+        time_passed = timezone.now() - obj.created_at
+        days = time_passed.days
+        seconds = time_passed.seconds
+        if days >= 365:
+            return f"{days // 365} г. назад"
+
+        if days >= 30:
+            return f"{days // 30} мес. назад"
+
+        if days >= 1:
+            return f"{days} д. назад"
+
+        if seconds >= 3600:
+            return f"{seconds // 3600} ч. назад"
+
+        return f"{seconds // 60} мин. назад"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        views_placeholder = ""
+        if data["views_count"] >= 1_000_000:
+            views_placeholder = "млн."
+            data["views_count"] //= 1_000_000
+        elif data["views_count"] >= 1_000:
+            views_placeholder = "тыс."
+            data["views_count"] //= 1_000
+
+        data["views_count"] = f'{data["views_count"]} {views_placeholder}'
+        return data
 
 
 class VideoDetailSerializer(serializers.ModelSerializer):

@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.core import permissions as core_permissions
+from apps.core import authentication
 from apps.core import mixins as core_mixins
 from apps.core.views import ModelViewSet
 from . import serializers, models
@@ -34,6 +35,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         IsAuthenticatedOrReadOnly,
         core_permissions.IsObjectOwnerOrReadonly,
     ]
+    authentication_classes = [authentication.JwtAuthenticationNoException]
     file_fields_and_functions = {
         "video": models.video_upload_to,
         "preview": models.video_preview_upload_to,
@@ -148,6 +150,6 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     )
     def user_videos(self, request):
         serializer = self.get_serializer(
-            instance=request.user.uploaded_videos.order_by("-updated_at"), many=True
+            instance=request.user.uploaded_videos.order_by("-created_at"), many=True
         )
         return Response(serializer.data)

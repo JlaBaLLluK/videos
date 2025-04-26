@@ -37,6 +37,7 @@ const videos = defineModel();
             <div class="d-flex flex-column">
               <span>{{ video.title }}</span>
               <span>Просмотров: {{ video.views_count }}</span>
+              <span>{{ video.published_ago }}</span>
             </div>
           </div>
           <slot name="actions" :videoId="video.id"></slot>
