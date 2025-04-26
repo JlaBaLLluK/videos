@@ -6,6 +6,7 @@ import UpdatePassword from '@/components/dialogs/UpdatePassword.vue';
 import DeleteAccount from '@/components/dialogs/DeleteAccount.vue';
 import {getFileFromUrl} from '@/utils/imageUtils.js';
 import SubmitButton from '@/components/buttons/SubmitButton.vue';
+import ResetButton from '@/components/buttons/ResetButton.vue';
 
 const emits = defineEmits(['profilePhotoChanged']);
 
@@ -13,15 +14,15 @@ const router = useRouter();
 const route = useRoute();
 
 const user = JSON.parse(localStorage.getItem('user'));
-
-const form = ref({
+const initial = ref({
   username: user.username,
   email: user.email,
   last_name: user.last_name,
   first_name: user.first_name,
   description: user.description,
-  profile_photo: {},
 });
+
+const form = ref({});
 const errors = ref({});
 const profilePhotoPreview = ref(null);
 const updatePasswordDialogOpen = ref(false);
@@ -50,9 +51,12 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
+  form.value = {...initial.value};
   if (user.profile_photo) {
     profilePhotoPreview.value = user.profile_photo;
-    form.value.profile_photo = await getFileFromUrl(user.profile_photo);
+    const file = await getFileFromUrl(user.profile_photo);
+    form.value.profile_photo = file;
+    initial.value.profile_photo = file;
   }
 });
 
@@ -117,6 +121,7 @@ onMounted(async () => {
       <p class="cursor-pointer" style="font-size: 1.1rem" @click="updatePasswordDialogOpen = true"><u>Сменить пароль</u></p>
       <p class="cursor-pointer text-danger" style="font-size: 1.1rem" @click="deleteAccountDialogOpen = true"><u>Удалить аккаунт</u></p>
       <div class="d-flex w-100 justify-center ga-3">
+        <reset-button v-model="form" :initial="initial" />
         <submit-button text="Сохранить" />
       </div>
     </v-form>

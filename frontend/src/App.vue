@@ -53,7 +53,7 @@ onUnmounted(() => {
 <template>
   <v-app>
     <div class="site-container d-flex vh-100">
-      <v-app-bar>
+      <v-app-bar class="position-fixed">
         <nav class="navbar w-100 h-100">
           <div class="pl-5 h-100">
             <router-link to="/">

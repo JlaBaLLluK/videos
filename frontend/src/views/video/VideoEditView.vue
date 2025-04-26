@@ -8,6 +8,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {getFileFromUrl} from '@/utils/imageUtils.js';
 import SubmitButton from '@/components/buttons/SubmitButton.vue';
 import {editVideo} from '@/api/video.js';
+import ResetButton from '@/components/buttons/ResetButton.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -21,10 +22,11 @@ const form = ref({
 const errors = ref({});
 const uploadProgress = ref(0);
 const loading = ref(true);
+const initial = ref({});
 
 async function getInitial() {
   const response = await baseAPI.get(`video/videos/${route.params.id}/`, {params: {isInitialReceive: true}});
-  return response.data;
+  initial.value = response.data;
 }
 
 async function submit() {
@@ -38,10 +40,12 @@ async function submit() {
 }
 
 onMounted(async () => {
-  const initial = await getInitial();
-  form.value = {...initial};
+  await getInitial();
+  form.value = {...initial.value};
   if (form.value.preview) {
-    form.value.preview = await getFileFromUrl(`http://${import.meta.env.VITE_API_URL}${initial.preview}`);
+    const file = await getFileFromUrl(`http://${import.meta.env.VITE_API_URL}${initial.value.preview}`);
+    form.value.preview = file;
+    initial.value.preview = file;
   }
 
   loading.value = false;
@@ -57,6 +61,7 @@ onMounted(async () => {
         <video-form v-model="form" :errors="errors">
           <video-upload-progress v-if="!errors" v-model="uploadProgress" />
           <div class="d-flex justify-center w-100 ga-3">
+            <reset-button v-model="form" :initial="initial" />
             <submit-button text="Сохранить" />
           </div>
         </video-form>
