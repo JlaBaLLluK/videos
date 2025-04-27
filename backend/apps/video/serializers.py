@@ -15,6 +15,11 @@ class VideoEditSerializer(
         model = models.Video
         fields = ("title", "description", "preview")
 
+    def get_fields(self):
+        fields = super().get_fields()
+        fields["preview"].required = False
+        return fields
+
 
 class VideoCreateSerializer(VideoEditSerializer):
     class Meta(VideoEditSerializer.Meta):

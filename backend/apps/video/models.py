@@ -15,7 +15,7 @@ def video_preview_upload_to(instance, filename):
 
 class Video(core_mixins.CreatedUpdatedMixin):
     video = models.FileField(upload_to=video_upload_to)
-    preview = models.ImageField(upload_to=video_preview_upload_to, blank=True)
+    preview = models.ImageField(upload_to=video_preview_upload_to)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     author = models.ForeignKey(

@@ -8,7 +8,7 @@ from apps.core import permissions as core_permissions
 from apps.core import authentication
 from apps.core import mixins as core_mixins
 from apps.core.views import ModelViewSet
-from . import serializers, models
+from . import serializers, models, utils
 
 
 @extend_schema_view(
@@ -42,6 +42,11 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     }
     creator_field = "author"
 
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        if not serializer.instance.preview:
+            utils.generate_preview(serializer.instance)
+
     def retrieve(self, request, *args, **kwargs):
         video = self.get_object()
         if request.query_params.get("isInitialReceive"):
@@ -62,6 +67,8 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         instance = self.get_object()
         instance.preview.delete(save=False)
         super().perform_update(serializer)
+        if not serializer.instance.preview:
+            utils.generate_preview(instance)
 
     @extend_schema(description="Like video by user")
     @action(
