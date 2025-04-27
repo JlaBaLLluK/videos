@@ -58,13 +58,11 @@ onMounted(async () => {
     <h4>Редактирование видео</h4>
     <div class="mt-5">
       <v-form @submit.prevent="submit">
-        <video-form v-model="form" :errors="errors">
-          <video-upload-progress v-if="!errors" v-model="uploadProgress" />
-          <div class="d-flex justify-center w-100 ga-3">
-            <reset-button v-model="form" :initial="initial" />
-            <submit-button text="Сохранить" />
-          </div>
-        </video-form>
+        <video-form v-model="form" :errors="errors" />
+        <div class="d-flex justify-center w-100 ga-3 mt-2">
+          <reset-button v-model="form" :initial="initial" />
+          <submit-button text="Сохранить" />
+        </div>
       </v-form>
     </div>
   </div>

@@ -9,7 +9,7 @@ defineProps({
   },
   textPlaceholder: {
     type: String,
-    required: true,
+    required: false,
   }
 });
 
@@ -18,7 +18,7 @@ defineProps({
 <template>
   <v-avatar :size="size" rounded="lg">
     <v-img v-if="photo" :src="photo" />
-    <span v-else class="default-photo fs-1">{{ textPlaceholder[0].toUpperCase() }}</span>
+    <span v-else-if="textPlaceholder" class="default-photo fs-1">{{ textPlaceholder[0].toUpperCase() }}</span>
   </v-avatar>
 </template>
 

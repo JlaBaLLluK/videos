@@ -1,7 +1,20 @@
 <script setup>
+import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
+import {ref, watch} from 'vue';
+
 defineProps(['errors']);
 
 const form = defineModel();
+
+const videoPreview = ref(form.value.preview ? URL.createObjectURL(form.value.preview) : '');
+
+watch(() => form.value.preview,
+  (newValue) => {
+    if (newValue) {
+      console.log(newValue);
+      videoPreview.value = URL.createObjectURL(newValue);
+    }
+  });
 </script>
 
 <template>
@@ -22,11 +35,17 @@ const form = defineModel();
     placeholder="Введите описание видео"
     :error-messages="errors?.description"
   />
+  <slot></slot>
   <v-file-input
     v-model="form.preview"
     class="mt-3"
     label="Выберите превью видео"
     :error-messages="errors?.preview"
   />
-  <slot></slot>
+  <div
+    v-if="form.preview"
+    class="d-flex flex-column align-center"
+  >
+    <photo-with-default class="text-center" :photo="videoPreview" :size="250" />
+  </div>
 </template>

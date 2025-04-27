@@ -58,7 +58,7 @@ onBeforeMount(() => {
         />
         <video-upload-progress v-if="!errors && uploadProgress > -1" v-model="uploadProgress" />
       </video-form>
-      <div class="d-flex w-100 justify-center ga-3">
+      <div class="d-flex w-100 justify-center ga-3 mt-2">
         <submit-button text="Загрузить" />
       </div>
     </v-form>

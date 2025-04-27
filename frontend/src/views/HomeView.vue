@@ -20,7 +20,6 @@ onMounted(async () => {
         <div class="d-flex flex-column h-100">
           <photo-with-default
             :size="350"
-            :text-placeholder="video.title"
             :photo="video.preview"
           />
           <div class="d-flex ga-3 pt-3">
