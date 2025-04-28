@@ -47,7 +47,7 @@ function removeElement(username) {
               :photo="item.profile_photo"
             />
             <div class="d-flex flex-column">
-              <span style="font-size: 1.1rem">{{ item?.channel_name || username }}</span>
+              <span style="font-size: 1.1rem">{{ item.channel_name }}</span>
               <span>{{ item.description_preview }}</span>
             </div>
           </div>
