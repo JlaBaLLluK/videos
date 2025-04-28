@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from . import models
 from apps.video import serializers as video_serializers
+from apps.video import models as video_models
 
 
 class PlaylistCreateSerializer(serializers.ModelSerializer):
@@ -20,12 +21,17 @@ class PlaylistsListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Playlist
-        fields = ("name", "playlist_preview", "videos_count", "id")
+        fields = ("name", "videos_count", "id", "playlist_preview")
 
-    @staticmethod
-    def get_playlist_preview(obj):
-        first_video = obj.videos.through.objects.order_by("-add_date").first()
-        return first_video.preview if first_video else None
+    def get_playlist_preview(self, obj):
+        video_playlist = (
+            obj.videos.through.objects.filter(playlist=obj).order_by("add_date").first()
+        )
+        if not video_playlist:
+            return None
+
+        video = video_playlist.video
+        return self.context["request"].build_absolute_uri(video.preview.url)
 
     @staticmethod
     def get_videos_count(obj):
@@ -33,17 +39,17 @@ class PlaylistsListSerializer(serializers.ModelSerializer):
 
 
 class PlaylistEditSerializer(serializers.ModelSerializer):
-    videos = serializers.SerializerMethodField()
+    videos = serializers.PrimaryKeyRelatedField(
+        queryset=video_models.Video.objects.all(), many=True
+    )
+    videos_in_playlist = video_serializers.VideosListSerializer(
+        many=True, source="videos", read_only=True
+    )
     videos_outside_playlist = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = models.Playlist
-        fields = ("name", "videos", "videos_outside_playlist")
-
-    def get_videos(self, obj):
-        return video_serializers.VideosListSerializer(
-            obj.videos, many=True, context=self.context
-        ).data
+        fields = ("name", "videos", "videos_outside_playlist", "videos_in_playlist")
 
     def get_videos_outside_playlist(self, obj):
         queryset = self.context["request"].user.uploaded_videos.exclude(

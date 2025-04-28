@@ -1,7 +1,6 @@
 <script setup>
 import VideoForm from '@/components/video/VideoForm.vue';
 import {onMounted, ref} from 'vue';
-import VideoUploadProgress from '@/components/video/VideoUploadProgress.vue';
 import ProgressBar from '@/components/ProgressBar.vue';
 import baseAPI from '@/api/api.js';
 import {useRoute, useRouter} from 'vue-router';
@@ -20,7 +19,6 @@ const form = ref({
   video: {}
 });
 const errors = ref({});
-const uploadProgress = ref(0);
 const loading = ref(true);
 const initial = ref({});
 

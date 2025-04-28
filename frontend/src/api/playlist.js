@@ -20,6 +20,22 @@ export async function getPlaylists() {
   return response.data;
 }
 
+export async function editPlaylist(id, data) {
+  try {
+    data.videos = data.videos_in_playlist.map((item) => item.id);
+    const response = await baseAPI.patch(`playlist/playlists/${id}/`, data);
+    return {
+      data: response.data,
+      status: response.status
+    };
+  } catch (error) {
+    return {
+      data: error.response.data,
+      status: error.status
+    };
+  }
+}
+
 export async function deletePlaylist(playlistId) {
   await baseAPI.delete(`/playlist/playlists/${playlistId}/`);
 }

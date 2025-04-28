@@ -3,10 +3,12 @@ import SubmitButton from '@/components/buttons/SubmitButton.vue';
 import {onMounted, ref} from 'vue';
 import ResetButton from '@/components/buttons/ResetButton.vue';
 import baseAPI from '@/api/api.js';
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import VideosList from '@/components/video/VideosList.vue';
 import ProgressBar from '@/components/ProgressBar.vue';
+import {editPlaylist} from '@/api/playlist.js';
 
+const router = useRouter();
 const route = useRoute();
 
 const initial = ref({});
@@ -22,15 +24,20 @@ function moveVideo(videoId, source, destination) {
 }
 
 function addToPlaylist(videoId) {
-  moveVideo(videoId, form.value.videos_outside_playlist, form.value.videos);
+  moveVideo(videoId, form.value.videos_outside_playlist, form.value.videos_in_playlist);
 }
 
 function removeFromPlaylist(videoId) {
-  moveVideo(videoId, form.value.videos, form.value.videos_outside_playlist);
+  moveVideo(videoId, form.value.videos_in_playlist, form.value.videos_outside_playlist);
 }
 
 async function submit() {
-
+  const response = await editPlaylist(route.params.id, form.value);
+  if (response.status !== 200) {
+    errors.value = response.data;
+  } else {
+    await router.push({name: 'playlistsList'});
+  }
 }
 
 onMounted(async () => {
@@ -78,7 +85,7 @@ onMounted(async () => {
         </div>
         <div class="w-50">
           <span class="fs-5">Видео в плейлисте:</span>
-          <videos-list v-model="form.videos" no-data-text="нет видео">
+          <videos-list v-model="form.videos_in_playlist" no-data-text="нет видео">
             <template #actions="{ videoId }">
               <v-tooltip text="Убрать из плейлиста" location="bottom">
                 <template v-slot:activator="{props}">

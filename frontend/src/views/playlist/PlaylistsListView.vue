@@ -5,7 +5,7 @@ import {deletePlaylist, getPlaylists} from '@/api/playlist.js';
 import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
 
 const playlists = ref([]);
-const loading = ref(false);
+const loading = ref(true);
 const userPlaylistsMessage = computed(() => `Ваши плейлисты (${playlists.value.length}):`);
 
 async function handleDelete(playlistId) {
@@ -15,6 +15,7 @@ async function handleDelete(playlistId) {
 
 onMounted(async () => {
   playlists.value = await getPlaylists();
+  loading.value = false;
 });
 </script>
 
