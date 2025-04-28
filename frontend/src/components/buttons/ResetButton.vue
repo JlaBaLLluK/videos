@@ -11,6 +11,6 @@ const form = defineModel();
     width="200"
     class="mt-2"
     text="Отмена"
-    @click="form = initial"
+    @click="form = JSON.parse(JSON.stringify(initial))"
   />
 </template>

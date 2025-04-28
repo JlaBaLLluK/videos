@@ -19,3 +19,7 @@ export async function getPlaylists() {
   const response = await baseAPI.get('/playlist/playlists/');
   return response.data;
 }
+
+export async function deletePlaylist(playlistId) {
+  await baseAPI.delete(`/playlist/playlists/${playlistId}/`);
+}

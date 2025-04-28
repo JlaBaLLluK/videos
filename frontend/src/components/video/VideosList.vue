@@ -36,7 +36,6 @@ const videos = defineModel();
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex ga-3 w-100">
             <video-preview
-              :size="150"
               :text-placeholder="video.title"
               :photo="video.preview"
             />

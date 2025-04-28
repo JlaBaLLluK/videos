@@ -11,6 +11,15 @@ export const playlistRoutes = [
         path: 'create',
         name: 'playlistCreate',
         component: () => import('@/views/playlist/PlaylistCreateView.vue')
+      },
+      {
+        path: ':id/edit',
+        name: 'playlistEdit',
+        component: () => import('@/views/playlist/PlaylistEditView.vue')
+      },
+      {
+        path: ':id',
+        name: 'playlistDetail',
       }
     ]
   }
