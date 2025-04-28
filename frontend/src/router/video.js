@@ -13,5 +13,10 @@ export const videoRoutes = [
         component: () => import('@/views/video/VideoEditView.vue')
       }
     ]
+  },
+  {
+    path: '/watch-later',
+    name: 'watchLater',
+    component: () => import('@/views/video/WatchLaterView.vue')
   }
 ];

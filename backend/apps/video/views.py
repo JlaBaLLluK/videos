@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.db.models import F
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
@@ -30,6 +31,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         "watched_by_user": serializers.VideosListSerializer,
         "liked_by_user": serializers.VideosListSerializer,
         "user_videos": serializers.VideosListSerializer,
+        "watch_later": serializers.VideosListSerializer,
     }
     permission_classes = [
         IsAuthenticatedOrReadOnly,
@@ -94,7 +96,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             video.likes_count -= 1
 
         video.save()
-        return Response({"success": response_message})
+        return Response({"message": response_message})
 
     @extend_schema(description="Dislike video by user")
     @action(
@@ -120,7 +122,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             video.dislikes_count -= 1
 
         video.save()
-        return Response({"success": response_message})
+        return Response({"message": response_message})
 
     @extend_schema(description="List of disliked by user videos")
     @action(
@@ -131,7 +133,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     )
     def watched_by_user(self, request):
         serializer = self.get_serializer(
-            instance=request.user.watched_videos.all(), many=True
+            instance=request.user.watched_videos.order_by("-made_action_at"), many=True
         )
         return Response(serializer.data)
 
@@ -144,7 +146,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     )
     def liked_by_user(self, request):
         serializer = self.get_serializer(
-            instance=request.user.liked_videos.all(), many=True
+            instance=request.user.liked_videos.order_by("-made_action_at"), many=True
         )
         return Response(serializer.data)
 
@@ -160,3 +162,32 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             instance=request.user.uploaded_videos.order_by("-created_at"), many=True
         )
         return Response(serializer.data)
+
+    @action(
+        methods=["GET", "POST"],
+        detail=False,
+        url_path="watch-later",
+        permission_classes=[IsAuthenticated],
+    )
+    def watch_later(self, request):
+        if request.method == "GET":
+            watch_later_videos_with_action_date = (
+                request.user.videos_to_watch_later.annotate(
+                    made_action_at=F("watchlater__made_action_at")
+                ).order_by("-made_action_at")
+            )
+            serializer = self.get_serializer(
+                instance=watch_later_videos_with_action_date, many=True
+            )
+            return Response(serializer.data)
+
+        video_id = request.data["video_id"]
+        video = models.Video.objects.get(pk=video_id)
+        if request.user not in video.watch_later_users.all():
+            video.watch_later_users.add(request.user, through_defaults={})
+            message = 'Видео добавлено в плейлист "Смотреть позже"'
+        else:
+            video.watch_later_users.remove(request.user)
+            message = 'Видео убрано из плейлиста "Смотреть позже"'
+
+        return Response({"message": message})

@@ -113,7 +113,7 @@ onUnmounted(() => {
               <v-list-item-title>Понравившиеся</v-list-item-title>
             </div>
           </v-list-item>
-          <v-list-item link>
+          <v-list-item link :to="{name: 'watchLater'}">
             <div class="d-flex ga-3">
               <v-icon>mdi-clock-outline</v-icon>
               <v-list-item-title>Смотреть позже</v-list-item-title>

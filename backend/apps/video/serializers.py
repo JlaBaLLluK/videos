@@ -99,15 +99,3 @@ class VideoDetailSerializer(serializers.ModelSerializer):
         fields["likes_count"].read_only = True
         fields["dislikes_count"].read_only = True
         return fields
-
-
-class WatchesHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ViewsHistory
-        fields = ("user", "video")
-
-
-class LikesHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.LikesHistory
-        fields = ("user", "video")

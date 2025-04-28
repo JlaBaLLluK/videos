@@ -33,6 +33,9 @@ class Video(core_mixins.CreatedUpdatedMixin):
         to="core.User", related_name="disliked_videos", through="video.DislikesHistory"
     )
     dislikes_count = models.PositiveIntegerField(default=0)
+    watch_later_users = models.ManyToManyField(
+        to="core.User", through="video.WatchLater", related_name="videos_to_watch_later"
+    )
 
 
 class AbstractUserVideoModel(models.Model):
@@ -54,4 +57,8 @@ class LikesHistory(AbstractUserVideoModel):
 
 
 class DislikesHistory(AbstractUserVideoModel):
+    pass
+
+
+class WatchLater(AbstractUserVideoModel):
     pass

@@ -1,24 +1,23 @@
 <script setup>
-import {onMounted, ref} from 'vue';
-import {addOrRemoveToWatchLater, getVideos} from '@/api/video.js';
+import {computed, onMounted, ref} from 'vue';
+import {addOrRemoveToWatchLater, watchLaterVideos} from '@/api/video.js';
 import VideosList from '@/components/video/VideosList.vue';
 import {infoToast} from '@/plugins/toasts.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 
 const videos = ref([]);
 const loading = ref(true);
+const haveDataText = computed(() => `Видео для просмотра позже (${videos.value.length}):`);
 
-async function watchLater(videoId) {
+async function removeFromWatchLater(videoId) {
   const data = await addOrRemoveToWatchLater(videoId);
   infoToast(data.message);
+  const indexToRemove = videos.value.indexOf(videos.value.find((video) => video.id === videoId));
+  videos.value.splice(indexToRemove, 1);
 }
 
 onMounted(async () => {
-  const response = await getVideos('video/videos/');
-  if (response.status === 200) {
-    videos.value = response.data;
-  }
-
+  videos.value = await watchLaterVideos();
   loading.value = false;
 });
 </script>
@@ -29,7 +28,8 @@ onMounted(async () => {
     v-else
     v-model="videos"
     :display-author="true"
-    no-data-text="Ещё нет видео"
+    no-data-text="Тут еще ничего нет."
+    :have-data-text="haveDataText"
   >
     <template #actions="{videoId}">
       <v-menu>
@@ -39,15 +39,11 @@ onMounted(async () => {
           </v-btn>
         </template>
         <v-list>
-          <v-list-item @click="watchLater(videoId)">
-            Смотреть позже
+          <v-list-item @click="removeFromWatchLater(videoId)">
+            Убрать из плейлиста
           </v-list-item>
         </v-list>
       </v-menu>
     </template>
   </videos-list>
 </template>
-
-<style scoped>
-
-</style>
