@@ -37,6 +37,14 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         IsAuthenticatedOrReadOnly,
         core_permissions.IsObjectOwnerOrReadonly,
     ]
+    actions_permissions_map = {
+        "like": [IsAuthenticated],
+        "dislike": [IsAuthenticated],
+        "watched_by_user": [IsAuthenticated],
+        "liked_by_user": [IsAuthenticated],
+        "user_videos": [IsAuthenticated],
+        "watch_later": [IsAuthenticated],
+    }
     authentication_classes = [authentication.JwtAuthenticationNoException]
     file_fields_and_functions = {
         "video": models.video_upload_to,
@@ -73,11 +81,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             utils.generate_preview(instance)
 
     @extend_schema(description="Like video by user")
-    @action(
-        methods=["POST"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-    )
+    @action(methods=["POST"], detail=True)
     def like(self, request, *args, **kwargs):
         video = self.get_object()
         try:
@@ -99,11 +103,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         return Response({"message": response_message})
 
     @extend_schema(description="Dislike video by user")
-    @action(
-        methods=["POST"],
-        detail=True,
-        permission_classes=[IsAuthenticatedOrReadOnly],
-    )
+    @action(methods=["POST"], detail=True)
     def dislike(self, request, *args, **kwargs):
         video = self.get_object()
         try:
@@ -125,12 +125,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         return Response({"message": response_message})
 
     @extend_schema(description="List of disliked by user videos")
-    @action(
-        methods=["GET"],
-        detail=False,
-        url_path="my-watched",
-        permission_classes=[IsAuthenticated],
-    )
+    @action(methods=["GET"], detail=False, url_path="my-watched")
     def watched_by_user(self, request):
         serializer = self.get_serializer(
             instance=request.user.watched_videos.order_by("-made_action_at"), many=True
@@ -138,12 +133,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(description="List of liked by user videos")
-    @action(
-        methods=["GET"],
-        detail=False,
-        url_path="my-liked",
-        permission_classes=[IsAuthenticated],
-    )
+    @action(methods=["GET"], detail=False, url_path="my-liked")
     def liked_by_user(self, request):
         serializer = self.get_serializer(
             instance=request.user.liked_videos.order_by("-made_action_at"), many=True
@@ -151,24 +141,14 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(description="List of uploaded by user videos")
-    @action(
-        methods=["GET"],
-        detail=False,
-        url_path="my-published",
-        permission_classes=[IsAuthenticated],
-    )
+    @action(methods=["GET"], detail=False, url_path="my-published")
     def user_videos(self, request):
         serializer = self.get_serializer(
             instance=request.user.uploaded_videos.order_by("-created_at"), many=True
         )
         return Response(serializer.data)
 
-    @action(
-        methods=["GET", "POST"],
-        detail=False,
-        url_path="watch-later",
-        permission_classes=[IsAuthenticated],
-    )
+    @action(methods=["GET", "POST"], detail=False, url_path="watch-later")
     def watch_later(self, request):
         if request.method == "GET":
             watch_later_videos_with_action_date = (

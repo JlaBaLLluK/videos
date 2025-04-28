@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # project apps
     "apps.core",
     "apps.video",
+    "apps.playlist",
     # third-party apps
     "rest_framework",
     "corsheaders",

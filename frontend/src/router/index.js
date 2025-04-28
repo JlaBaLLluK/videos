@@ -1,8 +1,9 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import {videoRoutes} from '@/router/video.js';
+import {playlistRoutes} from '@/router/playlist.js';
 
 const routes = [
-  ...videoRoutes,
+  ...videoRoutes, ...playlistRoutes,
   {
     path: '/',
     name: 'home',

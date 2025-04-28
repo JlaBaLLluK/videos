@@ -18,6 +18,7 @@ api_v1_urls = [
     ),
     path("core/", include("apps.core.urls")),
     path("video/", include("apps.video.urls")),
+    path("playlist/", include("apps.playlist.urls")),
     # drf-spectacular urls
     path("swagger/", spectacular_views.SpectacularSwaggerView.as_view()),
     path("schema/", spectacular_views.SpectacularAPIView.as_view(), name="schema"),

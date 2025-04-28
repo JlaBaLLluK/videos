@@ -43,11 +43,12 @@ class User(AbstractUser, mixins.CreatedUpdatedMixin):
 
     @property
     def channel_name(self) -> str:
-        return (
+        channel_name = (
             f"{self.last_name} {self.first_name}"
             if self.first_name or self.last_name
             else self.username
         )
+        return channel_name.strip()
 
     @property
     def subscribers_count(self) -> int:
