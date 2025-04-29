@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {userLogout} from '@/api/index.js';
 
@@ -10,6 +10,7 @@ const user = ref(JSON.parse(localStorage.getItem('user')));
 const isAuthenticated = ref(!!user.value);
 const isMenuOpened = ref(false);
 const isSidebarCollapsed = ref(false);
+const searchQuery = ref('');
 
 const showSidebar = computed(() => !['registration', 'login', 'registrationConfirm'].includes(route.name));
 const collapseSidebarIcon = computed(() => isSidebarCollapsed.value ? 'mdi-arrow-right' : 'mdi-arrow-left');
@@ -38,6 +39,12 @@ async function logout() {
   await router.push({name: 'home'});
 }
 
+watch(() => route.query?.search_query, (newValue) => {
+  if (route.name === 'searchResult') {
+    searchQuery.value = newValue;
+  }
+});
+
 onMounted(() => {
   window.addEventListener('user-login', userLoginEventHandler);
   window.addEventListener('user-logout', userLogoutEventHandler);
@@ -53,7 +60,7 @@ onUnmounted(() => {
 <template>
   <v-app>
     <div class="site-container d-flex vh-100">
-      <v-app-bar class="position-fixed">
+      <v-app-bar class="position-fixed pa-0">
         <nav class="navbar w-100 h-100">
           <div class="pl-5 h-100">
             <router-link to="/">
@@ -62,6 +69,20 @@ onUnmounted(() => {
                 <span>VidFlow</span>
               </div>
             </router-link>
+          </div>
+          <div class="w-25 h-100 d-flex">
+            <v-text-field
+              v-model="searchQuery"
+              class="pl-3"
+              placeholder="Введите запрос"
+              clearable
+              style="box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); border-radius: 15px;"
+              variant="plain"
+              density="comfortable"
+            />
+            <v-btn icon @click="router.push({name: 'searchResult', query: {search_query: searchQuery}})">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
           </div>
           <div class="pr-5">
             <v-menu v-model="isMenuOpened">

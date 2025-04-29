@@ -180,3 +180,8 @@ export async function getUsersList(url) {
     };
   }
 }
+
+export async function search(query) {
+  const response = await baseAPI.get('core/search/', {params: {search_query: query}});
+  return response.data;
+}

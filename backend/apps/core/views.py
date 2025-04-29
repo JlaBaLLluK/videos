@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -5,12 +6,18 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_200_OK
+from rest_framework.views import APIView
 
 from .authentication import JwtAuthenticationNoException
 from . import models
 from . import serializers
 from . import permissions
 from . import mixins
+
+from apps.video import models as video_models
+from apps.playlist import models as playlist_models
+from apps.video import serializers as video_serializers
+from apps.playlist import serializers as playlist_serializers
 
 
 class ModelViewSet(
@@ -169,3 +176,31 @@ class UserViewSet(ModelViewSet):
     def subscriptions(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=request.user.subscriptions, many=True)
         return Response(serializer.data, HTTP_200_OK)
+
+
+class SearchView(APIView):
+    def get(self, request):
+        query = request.query_params.get("search_query")
+        videos = video_models.Video.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+        users = models.User.objects.filter(
+            Q(username__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+        )
+        playlists = playlist_models.Playlist.objects.filter(Q(name__icontains=query))
+        video_serializer = video_serializers.VideosListSerializer(videos, many=True)
+        users_serializer = serializers.UserListSerializer(
+            users, many=True, context={"request": request}
+        )
+        playlist_serializer = playlist_serializers.PlaylistsListSerializer(
+            playlists, many=True, context={"request": request}
+        )
+        return Response(
+            {
+                "videos": video_serializer.data,
+                "users": users_serializer.data,
+                "playlists": playlist_serializer.data,
+            }
+        )

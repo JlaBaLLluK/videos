@@ -10,6 +10,11 @@ const routes = [
     component: () => import('@/views/HomeView.vue'),
   },
   {
+    path: '/results',
+    name: 'searchResult',
+    component: () => import('@/views/SearchResultView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'notFound',
     component: () => import('@/views/NotFound.vue'),
