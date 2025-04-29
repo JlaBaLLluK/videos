@@ -62,6 +62,7 @@ const routes = [
       {
         path: 'playlists',
         name: 'userPlaylists',
+        component: () => import('@/views/playlist/UserPlaylistsListView.vue'),
       }
     ]
   },

@@ -5,7 +5,7 @@ export const playlistRoutes = [
       {
         path: '',
         name: 'playlistsList',
-        component: () => import('@/views/playlist/PlaylistsListView.vue')
+        component: () => import('@/views/playlist/MyPlaylistsListView.vue')
       },
       {
         path: 'create',

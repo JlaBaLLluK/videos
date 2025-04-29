@@ -15,8 +15,8 @@ export async function createPlaylist(data) {
   }
 }
 
-export async function getPlaylists() {
-  const response = await baseAPI.get('/playlist/playlists/');
+export async function getPlaylists(endpoint) {
+  const response = await baseAPI.get(endpoint);
   return response.data;
 }
 

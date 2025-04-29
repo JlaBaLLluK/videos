@@ -10,11 +10,11 @@ const userPlaylistsMessage = computed(() => `Ваши плейлисты (${play
 
 async function handleDelete(playlistId) {
   await deletePlaylist(playlistId);
-  playlists.value = await getPlaylists();
+  playlists.value = await getPlaylists('/playlist/playlists?my_playlists=1');
 }
 
 onMounted(async () => {
-  playlists.value = await getPlaylists();
+  playlists.value = await getPlaylists('/playlist/playlists?my_playlists=1');
   loading.value = false;
 });
 </script>

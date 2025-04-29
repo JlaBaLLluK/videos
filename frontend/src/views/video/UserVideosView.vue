@@ -2,14 +2,20 @@
 import VideosList from '@/components/video/VideosList.vue';
 import {computed, onMounted, ref} from 'vue';
 import ProgressBar from '@/components/ProgressBar.vue';
-import {getVideos} from '@/api/video.js';
+import {addOrRemoveToWatchLater, getVideos} from '@/api/video.js';
 import {useRoute} from 'vue-router';
+import {infoToast} from '@/plugins/toasts.js';
 
 const route = useRoute();
 
 const loading = ref(true);
 const videos = ref([]);
 const haveVideosText = computed(() => `Видео (${videos.value.length}):`);
+
+async function watchLater(videoId) {
+  const data = await addOrRemoveToWatchLater(videoId);
+  infoToast(data.message);
+}
 
 onMounted(async () => {
   const response = await getVideos(`video/videos?by_username=${route.params.username}`);
