@@ -1,6 +1,6 @@
 export const playlistRoutes = [
   {
-    path: '/playlists',
+    path: '/my-playlists',
     children: [
       {
         path: '',

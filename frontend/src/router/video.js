@@ -5,7 +5,7 @@ export const videoRoutes = [
       {
         path: 'published',
         name: 'publishedVideos',
-        component: () => import('@/views/video/UserVideosView.vue')
+        component: () => import('@/views/video/MyVideosView.vue')
       },
       {
         path: ':id',

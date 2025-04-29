@@ -1,11 +1,12 @@
 from django.db import IntegrityError
 from django.db.models import F
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.core import permissions as core_permissions
+from apps.core import permissions as core_permissions, models as core_models
 from apps.core import authentication
 from apps.core import mixins as core_mixins
 from apps.core.views import ModelViewSet
@@ -51,6 +52,17 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         "preview": models.video_preview_upload_to,
     }
     creator_field = "author"
+
+    def get_queryset(self):
+        if self.request.query_params.get("my-published"):
+            return self.request.user.uploaded_videos.order_by("-created_at")
+
+        if username := self.request.query_params.get("by_username"):
+            return get_object_or_404(
+                core_models.User, username=username
+            ).uploaded_videos.order_by("-created_at")
+
+        return super().get_queryset()
 
     def perform_create(self, serializer):
         super().perform_create(serializer)
@@ -126,7 +138,9 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
 
     @extend_schema(description="List of disliked by user videos")
     @action(methods=["GET"], detail=False, url_path="my-watched")
-    def watched_by_user(self, request):
+    def watched_by_user(
+        self, request
+    ):  # TODO: move to <get_queryset> with query params
         serializer = self.get_serializer(
             instance=request.user.watched_videos.order_by("-made_action_at"), many=True
         )
@@ -137,14 +151,6 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     def liked_by_user(self, request):
         serializer = self.get_serializer(
             instance=request.user.liked_videos.order_by("-made_action_at"), many=True
-        )
-        return Response(serializer.data)
-
-    @extend_schema(description="List of uploaded by user videos")
-    @action(methods=["GET"], detail=False, url_path="my-published")
-    def user_videos(self, request):
-        serializer = self.get_serializer(
-            instance=request.user.uploaded_videos.order_by("-created_at"), many=True
         )
         return Response(serializer.data)
 

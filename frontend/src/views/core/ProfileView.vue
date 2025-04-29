@@ -86,10 +86,20 @@ onUnmounted(() => {
         <b class="cursor-pointer" @click="detailDialogOpen=true">Ещё</b>
       </div>
       <div v-if="isChannelOwner" class="d-flex justify-start ga-5 mt-5">
-        <v-btn variant="outlined" @click="$router.push({name: 'profileUpdate'})">
+        <v-btn class="channel-owner-buttons" variant="outlined" :to="{name: 'profileUpdate'}">
           Настроить информацию
         </v-btn>
-        <v-btn variant="outlined" @click="$router.push({name: 'videoUpload'})">Загрузить видео</v-btn>
+        <v-btn class="channel-owner-buttons" variant="outlined" :to="{name: 'videoUpload'}">
+          Загрузить видео
+        </v-btn>
+      </div>
+      <div v-else class="d-flex justify-start ga-5 mt-5">
+        <v-btn class="videos-playlists-buttons" variant="outlined" :to="{name: 'userVideos'}">
+          Видео
+        </v-btn>
+        <v-btn class="videos-playlists-buttons" variant="outlined" :to="{name: 'userPlaylists'}">
+          Плейлисты
+        </v-btn>
       </div>
     </div>
     <div class="mt-5 w-100">
@@ -102,3 +112,14 @@ onUnmounted(() => {
     :user="user"
   />
 </template>
+
+<style scoped>
+.channel-owner-buttons {
+  width: 250px;
+}
+
+.videos-playlists-buttons {
+  width: 200px;
+}
+
+</style>
