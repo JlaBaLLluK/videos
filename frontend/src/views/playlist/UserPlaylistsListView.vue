@@ -24,6 +24,7 @@ onMounted(async () => {
       v-model="playlists"
       no-data-text="Пользователь пока не создал ни одного плейлиста."
       :have-data-text="userPlaylistsMessage"
+      detail-route-name="userPlaylistDetail"
     />
   </div>
 </template>

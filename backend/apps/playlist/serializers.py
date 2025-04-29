@@ -38,6 +38,14 @@ class PlaylistsListSerializer(serializers.ModelSerializer):
         return obj.videos.count()
 
 
+class PlaylistDetailSerializer(serializers.ModelSerializer):
+    videos = video_serializers.VideosListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Playlist
+        fields = ("name", "videos")
+
+
 class PlaylistEditSerializer(serializers.ModelSerializer):
     videos = serializers.PrimaryKeyRelatedField(
         queryset=video_models.Video.objects.all(), many=True

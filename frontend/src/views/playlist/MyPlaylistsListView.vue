@@ -27,6 +27,7 @@ onMounted(async () => {
       no-data-text="Вы не создали еще ни одного плейлиста."
       :show-playlist-create="true"
       :have-data-text="userPlaylistsMessage"
+      detail-route-name="myPlaylistDetail"
     >
       <template #actions="{playlistId}">
         <v-menu>

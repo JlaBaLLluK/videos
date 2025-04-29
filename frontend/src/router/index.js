@@ -61,8 +61,18 @@ const routes = [
       },
       {
         path: 'playlists',
-        name: 'userPlaylists',
-        component: () => import('@/views/playlist/UserPlaylistsListView.vue'),
+        children: [
+          {
+            path: '',
+            name: 'userPlaylists',
+            component: () => import('@/views/playlist/UserPlaylistsListView.vue'),
+          },
+          {
+            path: ':id',
+            name: 'userPlaylistDetail',
+            component: () => import('@/views/playlist/PlaylistDetailView.vue')
+          }
+        ]
       }
     ]
   },

@@ -13,6 +13,7 @@ class PlaylistViewSet(ModelViewSet):
     serializer_class = serializers.PlaylistCreateSerializer
     actions_serializers_map = {
         "list": serializers.PlaylistsListSerializer,
+        "retrieve": serializers.PlaylistDetailSerializer,
         "partial_update": serializers.PlaylistEditSerializer,
         "playlist_initial": serializers.PlaylistEditSerializer,
     }

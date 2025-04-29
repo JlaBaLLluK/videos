@@ -20,6 +20,11 @@ export async function getPlaylists(endpoint) {
   return response.data;
 }
 
+export async function getPlaylistDetail(playlistId) {
+  const response = await baseAPI.get(`playlist/playlists/${playlistId}`);
+  return response.data;
+}
+
 export async function editPlaylist(id, data) {
   try {
     data.videos = data.videos_in_playlist.map((item) => item.id);
