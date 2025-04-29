@@ -104,7 +104,7 @@ onUnmounted(() => {
           <v-list-item link :to="{name: 'playlistsList'}">
             <div class="d-flex ga-3">
               <v-icon>mdi-playlist-play</v-icon>
-              <v-list-item-title>Ваши лейлисты</v-list-item-title>
+              <v-list-item-title>Ваши плейлисты</v-list-item-title>
             </div>
           </v-list-item>
           <v-list-item link>
