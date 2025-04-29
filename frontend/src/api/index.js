@@ -181,7 +181,7 @@ export async function getUsersList(url) {
   }
 }
 
-export async function search(query) {
-  const response = await baseAPI.get('core/search/', {params: {search_query: query}});
+export async function search(queryParans) {
+  const response = await baseAPI.get('core/search/', {params: queryParans});
   return response.data;
 }

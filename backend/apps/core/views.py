@@ -179,8 +179,13 @@ class UserViewSet(ModelViewSet):
 
 
 class SearchView(APIView):
+    authentication_classes = []
+
     def get(self, request):
         query = request.query_params.get("search_query")
+        if not query:
+            return Response()
+
         videos = video_models.Video.objects.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )
@@ -197,10 +202,10 @@ class SearchView(APIView):
         playlist_serializer = playlist_serializers.PlaylistsListSerializer(
             playlists, many=True, context={"request": request}
         )
-        return Response(
-            {
-                "videos": video_serializer.data,
-                "users": users_serializer.data,
-                "playlists": playlist_serializer.data,
-            }
-        )
+        content_type = request.query_params.get("content_type")
+        response_data = {
+            "videos": video_serializer.data,
+            "channels": users_serializer.data,
+            "playlists": playlist_serializer.data,
+        }
+        return Response(response_data[content_type] if content_type else response_data)

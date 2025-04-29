@@ -39,9 +39,12 @@ async function logout() {
   await router.push({name: 'home'});
 }
 
-watch(() => route.query?.search_query, (newValue) => {
-  if (route.name === 'searchResult') {
-    searchQuery.value = newValue;
+
+watch(() => route.name, (newValue) => {
+  if (newValue === 'searchResult') {
+    searchQuery.value = route.query.search_query;
+  } else {
+    searchQuery.value = '';
   }
 });
 
