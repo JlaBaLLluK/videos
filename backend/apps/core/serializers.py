@@ -52,6 +52,7 @@ class UserListSerializer(mixins.UserSerializerMixin, serializers.ModelSerializer
             "profile_photo",
             "description_preview",
             "is_request_user_subscribed",
+            "subscribers_count",
         )
 
 

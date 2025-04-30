@@ -16,7 +16,7 @@ async function submit() {
   if (response.status !== 201) {
     errors.value = response.data;
   } else {
-    await router.push({name: 'playlistsList'});
+    await router.push({name: 'myPlaylistsList'});
   }
 }
 </script>

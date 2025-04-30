@@ -3,10 +3,17 @@ import {computed, onMounted, ref} from 'vue';
 import ProgressBar from '@/components/ProgressBar.vue';
 import {deletePlaylist, getPlaylists} from '@/api/playlist.js';
 import PlaylistsList from '@/components/playlist/PlaylistsList.vue';
+import {useRoute} from 'vue-router';
+
+const route = useRoute();
 
 const playlists = ref([]);
 const loading = ref(true);
-const userPlaylistsMessage = computed(() => `Ваши плейлисты (${playlists.value.length}):`);
+
+const isOwnPlaylists = computed(() => route.name === 'myPlaylistsList');
+const noDataText = computed(() => isOwnPlaylists.value ? 'Вы не создали ни одного плейлиста.' : 'Пользователь не создал ни одного плейлиста.');
+const userPlaylistsMessage = computed(() => isOwnPlaylists.value ? 'Ваши плейлисты ' : 'Плейлисты ');
+const playlistsAmount = computed(() => `(${playlists.value.length}):`);
 
 async function handleDelete(playlistId) {
   await deletePlaylist(playlistId);
@@ -14,7 +21,14 @@ async function handleDelete(playlistId) {
 }
 
 onMounted(async () => {
-  playlists.value = await getPlaylists('/playlist/playlists?my_playlists=1');
+  let endpoint = '/playlist/playlists';
+  if (isOwnPlaylists.value) {
+    endpoint += '?my_playlists=1';
+  } else {
+    endpoint += `?by_username=${route.params.username}`;
+  }
+
+  playlists.value = await getPlaylists(endpoint);
   loading.value = false;
 });
 </script>
@@ -24,12 +38,12 @@ onMounted(async () => {
   <div v-else>
     <playlists-list
       v-model="playlists"
-      no-data-text="Вы не создали еще ни одного плейлиста."
-      :show-playlist-create="true"
-      :have-data-text="userPlaylistsMessage"
+      :no-data-text="noDataText"
+      :show-playlist-create="isOwnPlaylists"
+      :have-data-text="userPlaylistsMessage + playlistsAmount"
       detail-route-name="playlistDetail"
     >
-      <template #actions="{playlistId}">
+      <template v-if="isOwnPlaylists" #actions="{playlistId}">
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn variant="plain" v-bind="props" icon>

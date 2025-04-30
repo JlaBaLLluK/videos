@@ -16,6 +16,7 @@ defineProps({
 });
 
 const items = defineModel('items');
+const username = JSON.parse(localStorage.getItem('user'))?.username;
 
 function removeElement(username) {
   const removeIndex = items.value.indexOf(items.value.find((item) => item.username === username));
@@ -47,12 +48,14 @@ function removeElement(username) {
               :photo="item.profile_photo"
             />
             <div class="d-flex flex-column">
-              <span style="font-size: 1.1rem">{{ item.channel_name }}</span>
+              <span class="fw-bold" style="font-size: 1.1rem">{{ item.channel_name }}</span>
               <span>{{ item.description_preview }}</span>
+              <span>Поддписчиков: {{ item.subscribers_count }}</span>
             </div>
           </div>
           <div class="d-flex align-center">
             <subscribe-button
+              v-if="item.username !== username"
               :user="item"
               :need-remove-element="needRemoveElement"
               @remove-element="removeElement"

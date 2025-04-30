@@ -36,7 +36,7 @@ async function submit() {
   if (response.status !== 200) {
     errors.value = response.data;
   } else {
-    await router.push({name: 'playlistsList'});
+    await router.push({name: 'myPlaylistsList'});
   }
 }
 

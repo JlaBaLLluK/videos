@@ -70,7 +70,7 @@ const routes = [
           {
             path: '',
             name: 'userPlaylists',
-            component: () => import('@/views/playlist/UserPlaylistsListView.vue'),
+            component: () => import('@/views/playlist/PlaylistsListView.vue'),
           },
         ]
       }

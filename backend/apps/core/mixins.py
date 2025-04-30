@@ -77,7 +77,7 @@ class UserSerializerMixin(metaclass=serializers.SerializerMetaclass):
     @staticmethod
     def get_description_preview(instance):
         description_parts = instance.description.split()
-        description_preview_parts = description_parts[:40]
+        description_preview_parts = description_parts[:25]
         if len(description_preview_parts) < len(description_parts):
             description_preview_parts[-1] += "..."
 

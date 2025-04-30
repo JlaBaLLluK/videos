@@ -23,6 +23,7 @@ onMounted(async () => {
   <div v-else>
     <videos-list
       v-model="playlist.videos"
+      :display-author="true"
       no-data-text="В плейлисте еще нет видео."
       :have-data-text="haveDataText"
     />
