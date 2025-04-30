@@ -25,7 +25,7 @@ const playlists = defineModel();
 </script>
 
 <template>
-  <h4 v-if="!playlists.length">
+  <h4 v-if="!playlists || !playlists.length">
     {{ noDataText }}
     <router-link v-if="showPlaylistCreate" :to="{name: 'playlistCreate'}">
       Создать?

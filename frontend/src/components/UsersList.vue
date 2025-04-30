@@ -25,7 +25,7 @@ function removeElement(username) {
 </script>
 
 <template>
-  <div v-if="!items.length">
+  <div v-if="!items || !items.length">
     <h4>{{ noDataText }}</h4>
   </div>
   <div v-else>

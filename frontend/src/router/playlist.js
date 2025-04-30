@@ -1,6 +1,6 @@
 export const playlistRoutes = [
   {
-    path: '/my-playlists',
+    path: '/playlists',
     children: [
       {
         path: '',
@@ -19,7 +19,7 @@ export const playlistRoutes = [
       },
       {
         path: ':id',
-        name: 'myPlaylistDetail',
+        name: 'playlistDetail',
         component: () => import('@/views/playlist/PlaylistDetailView.vue')
       }
     ]

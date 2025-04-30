@@ -4,6 +4,9 @@ import {useRoute, useRouter} from 'vue-router';
 import {search} from '@/api/index.js';
 import ProgressBar from '@/components/ProgressBar.vue';
 import FiltersRadioGroup from '@/components/core/FiltersRadioGroup.vue';
+import VideosList from '@/components/video/VideosList.vue';
+import PlaylistsList from '@/components/playlist/PlaylistsList.vue';
+import UsersList from '@/components/UsersList.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -67,7 +70,16 @@ watch(() => contentType.value,
   async (newValue) => {
     loading.value = true;
     data.value = await search({search_query: route.query.search_query, content_type: newValue});
-
+    loading.value = false;
+  });
+watch(() => sorting.value,
+  async (newValue) => {
+    loading.value = true;
+    data.value = await search({
+      search_query: route.query.search_query,
+      content_type: contentType.value,
+      sort_by: newValue
+    });
     loading.value = false;
   });
 
@@ -105,8 +117,13 @@ onMounted(async () => {
         <filters-radio-group v-else-if="contentType === 'playlists'" v-model="sorting" :items="PLAYLISTS_SORT_RADIOS" />
       </div>
     </div>
-    <h4 class="mt-2">Результаты поиска по запросу:</h4>
-    <pre>{{ data }}</pre>
+    <h4 v-if="!data || (!data.videos?.length && !data.channels?.length && !data.playlists?.length)">По Вашему запросу ничего не найдено</h4>
+    <div v-else>
+      <h4 class="mt-2">Результаты поиска по запросу:</h4>
+      <videos-list v-model="data.videos" :display-author="true" />
+      <playlists-list v-model="data.playlists" detail-route-name="playlistDetail" />
+      <users-list :items="data.channels" />
+    </div>
   </div>
 </template>
 

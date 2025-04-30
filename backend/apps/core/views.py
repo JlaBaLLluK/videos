@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Count, Max
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -180,11 +180,41 @@ class UserViewSet(ModelViewSet):
 
 class SearchView(APIView):
     authentication_classes = []
+    content_type_serializers = {
+        "videos": video_serializers.VideosListSerializer,
+        "channels": serializers.UserListSerializer,
+        "playlists": playlist_serializers.PlaylistsListSerializer,
+    }
+    videos_sort_lookups = {
+        "newest": "-created_at",
+        "oldest": "created_at",
+        "popular": "views_count",
+    }
+    channels_sort_annotations = {
+        "subscribers": {
+            "annotation_name": "subscribers_count_annotation",
+            "annotation_func": Count("subscribers"),
+        },
+        "activity": {
+            "annotation_name": "last_video_upload_date",
+            "annotation_func": Max("uploaded_videos__created_at"),
+        },
+    }
+    playlists_sort_annotations = {
+        "videos": {
+            "annotation_name": "videos_count_annotation",
+            "annotation_func": Count("videos"),
+        },
+        "recently_updated": {
+            "annotation_name": "updated_at",
+            "annotation_func": None,
+        },
+    }
 
-    def get(self, request):
-        query = request.query_params.get("search_query")
+    def get_response_data(self):
+        query = self.request.query_params.get("search_query")
         if not query:
-            return Response()
+            return {}
 
         videos = video_models.Video.objects.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
@@ -195,17 +225,53 @@ class SearchView(APIView):
             | Q(last_name__icontains=query)
         )
         playlists = playlist_models.Playlist.objects.filter(Q(name__icontains=query))
-        video_serializer = video_serializers.VideosListSerializer(videos, many=True)
-        users_serializer = serializers.UserListSerializer(
-            users, many=True, context={"request": request}
-        )
-        playlist_serializer = playlist_serializers.PlaylistsListSerializer(
-            playlists, many=True, context={"request": request}
-        )
-        content_type = request.query_params.get("content_type")
         response_data = {
-            "videos": video_serializer.data,
-            "channels": users_serializer.data,
-            "playlists": playlist_serializer.data,
+            "videos": videos,
+            "channels": users,
+            "playlists": playlists,
         }
-        return Response(response_data[content_type] if content_type else response_data)
+        return response_data
+
+    def sort_response_data(self, queryset, content_type):
+        sort_by = self.request.query_params.get("sort_by")
+        if not sort_by:
+            return queryset
+
+        if content_type == "videos":
+            return queryset.order_by(self.videos_sort_lookups[sort_by])
+
+        if content_type == "channels":
+            annotation = self.channels_sort_annotations[sort_by]
+            return queryset.annotate(
+                **{annotation["annotation_name"]: annotation["annotation_func"]}
+            ).order_by(f"-{annotation['annotation_name']}")
+
+        if content_type == "playlists":
+            annotation = self.playlists_sort_annotations[sort_by]
+            annotation_func = annotation["annotation_func"]
+            if annotation_func:
+                queryset = queryset.annotate(
+                    **{annotation["annotation_name"]: annotation["annotation_func"]}
+                )
+
+            return queryset.order_by(f"-{annotation['annotation_name']}")
+
+        return queryset
+
+    def get(self, request):
+        response_data = self.get_response_data()
+        content_type = request.query_params.get("content_type")
+        if content_type:
+            response_data = response_data[content_type]
+            response_data = self.sort_response_data(response_data, content_type)
+            serializer = self.content_type_serializers[content_type](
+                response_data, many=True, context={"request": request}
+            )
+            return Response({content_type: serializer.data})
+
+        for content_type in response_data:
+            response_data[content_type] = self.content_type_serializers[content_type](
+                response_data[content_type], many=True, context={"request": request}
+            ).data
+
+        return Response(response_data)
