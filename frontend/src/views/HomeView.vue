@@ -4,6 +4,7 @@ import {addOrRemoveToWatchLater, getVideos} from '@/api/video.js';
 import VideosList from '@/components/video/VideosList.vue';
 import {infoToast} from '@/plugins/toasts.js';
 import ProgressBar from '@/components/ProgressBar.vue';
+import WatchLaterMenu from '@/components/video/menu/WatchLaterMenu.vue';
 
 const videos = ref([]);
 const loading = ref(true);
@@ -14,11 +15,7 @@ async function watchLater(videoId) {
 }
 
 onMounted(async () => {
-  const response = await getVideos('video/videos/');
-  if (response.status === 200) {
-    videos.value = response.data;
-  }
-
+  videos.value = await getVideos('video/videos/');
   loading.value = false;
 });
 </script>
@@ -32,22 +29,7 @@ onMounted(async () => {
     no-data-text="Ещё нет видео"
   >
     <template #actions="{videoId}">
-      <v-menu>
-        <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props" variant="plain">
-            <v-icon>mdi-dots-vertical</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item @click="watchLater(videoId)">
-            Смотреть позже
-          </v-list-item>
-        </v-list>
-      </v-menu>
+      <watch-later-menu text="Смотреть позже" @watch-later-clicked="watchLater(videoId)" />
     </template>
   </videos-list>
 </template>
-
-<style scoped>
-
-</style>

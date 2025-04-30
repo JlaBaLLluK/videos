@@ -62,7 +62,7 @@ const routes = [
       {
         path: 'videos',
         name: 'userVideos',
-        component: () => import('@/views/video/UserVideosView.vue'),
+        component: () => import('@/views/video/VideosListView.vue'),
       },
       {
         path: 'playlists',

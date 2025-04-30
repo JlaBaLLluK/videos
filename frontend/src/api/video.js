@@ -2,18 +2,8 @@ import baseAPI from '@/api/api.js';
 import {getMe} from '@/api/index.js';
 
 export async function getVideos(endpoint) {
-  try {
-    const response = await baseAPI.get(endpoint);
-    return {
-      data: response.data,
-      status: response.status
-    };
-  } catch (error) {
-    return {
-      data: error.response.data,
-      status: error.response.status,
-    };
-  }
+  const response = await baseAPI.get(endpoint);
+  return response.data;
 }
 
 export async function editVideo(videoId, data) {

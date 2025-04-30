@@ -4,8 +4,8 @@ export const videoRoutes = [
     children: [
       {
         path: 'published',
-        name: 'publishedVideos',
-        component: () => import('@/views/video/MyVideosView.vue')
+        name: 'myVideos',
+        component: () => import('@/views/video/VideosListView.vue')
       },
       {
         path: ':id',
@@ -17,6 +17,6 @@ export const videoRoutes = [
   {
     path: '/watch-later',
     name: 'watchLater',
-    component: () => import('@/views/video/WatchLaterView.vue')
+    component: () => import('@/views/video/VideosListView.vue')
   }
 ];
