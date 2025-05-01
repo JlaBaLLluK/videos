@@ -79,3 +79,11 @@ class VideoDetailSerializer(mixins.VideoSerializerMixin, serializers.ModelSerial
             self.context["request"].user.is_authenticated
             and self.context["request"].user in obj.users_disliked_video.all()
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["likes_count"] = core_utils.get_number_representation(instance.likes_count)
+        data["dislikes_count"] = core_utils.get_number_representation(
+            instance.dislikes_count
+        )
+        return data

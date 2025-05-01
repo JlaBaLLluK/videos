@@ -1,6 +1,6 @@
-from django.utils import timezone
-
 from rest_framework import serializers
+
+from apps.core import utils as core_utils
 
 
 class VideoSerializerMixin(metaclass=serializers.SerializerMetaclass):
@@ -8,32 +8,9 @@ class VideoSerializerMixin(metaclass=serializers.SerializerMetaclass):
 
     @staticmethod
     def get_published_ago(obj):
-        time_passed = timezone.now() - obj.created_at
-        days = time_passed.days
-        seconds = time_passed.seconds
-        if days >= 365:
-            return f"{days // 365} г. назад"
-
-        if days >= 30:
-            return f"{days // 30} мес. назад"
-
-        if days >= 1:
-            return f"{days} д. назад"
-
-        if seconds >= 3600:
-            return f"{seconds // 3600} ч. назад"
-
-        return f"{seconds // 60} мин. назад"
+        return core_utils.get_creation_date_representation(obj.created_at)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        views_placeholder = ""
-        if data["views_count"] >= 1_000_000:
-            views_placeholder = "млн."
-            data["views_count"] //= 1_000_000
-        elif data["views_count"] >= 1_000:
-            views_placeholder = "тыс."
-            data["views_count"] //= 1_000
-
-        data["views_count"] = f'{data["views_count"]} {views_placeholder}'
+        data["views_count"] = core_utils.get_number_representation(data["views_count"])
         return data
