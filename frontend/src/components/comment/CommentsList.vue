@@ -1,10 +1,13 @@
 <script setup>
-import {ref} from 'vue';
+import {ref, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import SubmitButton from '@/components/buttons/SubmitButton.vue';
 import baseAPI from '@/api/api.js';
 import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
 import DeleteEditMenu from '@/components/video/menu/DeleteEditMenu.vue';
+import FiltersRadioGroup from '@/components/core/FiltersRadioGroup.vue';
+
+const props = defineProps(['videoId']);
 
 const emits = defineEmits(['commentPublished', 'commentDeleted']);
 
@@ -15,11 +18,44 @@ const comments = defineModel();
 const isCommentCollapsed = ref(true);
 const username = ref(JSON.parse(localStorage.getItem('user'))?.username);
 const commentToEditId = ref(0);
-
+const sortingShown = ref(false);
+const isDescendingOrder = ref(true);
+const sorting = ref('');
 const form = ref({
   text: '',
   video: Number(route.params.id),
 });
+
+const SORT_ITEMS = [
+  {
+    label: 'По популярности',
+    value: 'likes_count',
+  },
+  {
+    label: 'По дате последнего изменения',
+    value: 'updated_at'
+  },
+];
+
+watch(() => sorting.value,
+  async (newValue) => {
+    const response = await baseAPI.get('comment/comments', {params: {
+      by_video: props.videoId,
+      sort_by: newValue,
+      is_descending_order: isDescendingOrder.value ? 1 : 0,
+    }});
+    comments.value = response.data;
+  });
+
+watch(() => isDescendingOrder.value,
+  async (newValue) => {
+    const response = await baseAPI.get('comment/comments', {params: {
+      by_video: props.videoId,
+      sort_by: sorting.value,
+      is_descending_order: newValue ? 1 : 0,
+    }});
+    comments.value = response.data;
+  });
 
 async function submit() {
   await baseAPI.post('comment/comments/', form.value);
@@ -49,6 +85,25 @@ async function submitEdit(commentId, commentText) {
   <h4 v-if="!comments || !comments.length">Комментариев нет.</h4>
   <div v-else>
     <h4>Комментарии ({{ comments.length }}):</h4>
+    <div class="d-flex flex-column">
+      <div class="d-flex cursor-pointer ga-2" @click="sortingShown = !sortingShown">
+        <v-icon>mdi-sort</v-icon>
+        <span
+          class="fw-bold cursor-pointer"
+          style="font-size: 18px"
+        >
+          Сортировка
+        </span>
+      </div>
+      <filters-radio-group
+        v-if="sortingShown"
+        v-model:is-descending-order="isDescendingOrder"
+        v-model="sorting"
+        :need-change-sort-order="true"
+        class="w-50"
+        :items="SORT_ITEMS"
+      />
+    </div>
     <v-list>
       <v-list-item v-for="comment in comments" :key="comment.id" class="border-b pa-4">
         <div class="d-flex ga-2 justify-space-between">

@@ -136,6 +136,7 @@ onMounted(async () => {
       <comments-list
         v-model="video.comments"
         class="mt-5"
+        :video-id="video.id"
         @comment-published="fetchComments"
         @comment-deleted="deleteComment"
       />
