@@ -6,13 +6,15 @@ import baseAPI from '@/api/api.js';
 import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
 import DeleteEditMenu from '@/components/video/menu/DeleteEditMenu.vue';
 
-const emits = defineEmits(['commentPublished', 'commentDeleted', 'commentEdit']);
+const emits = defineEmits(['commentPublished', 'commentDeleted']);
 
 const route = useRoute();
 
 const comments = defineModel();
+
 const isCommentCollapsed = ref(true);
 const username = ref(JSON.parse(localStorage.getItem('user'))?.username);
+const commentToEditId = ref(0);
 
 const form = ref({
   text: '',
@@ -22,6 +24,12 @@ const form = ref({
 async function submit() {
   await baseAPI.post('comment/comments/', form.value);
   form.value.text = '';
+  emits('commentPublished');
+}
+
+async function submitEdit(commentId, commentText) {
+  await baseAPI.patch(`comment/comments/${commentId}/`, {text: commentText});
+  commentToEditId.value = 0;
   emits('commentPublished');
 }
 
@@ -87,10 +95,25 @@ async function submit() {
           <div v-if="comment.author.username === username" class="d-flex justify-end">
             <delete-edit-menu
               @delete-clicked="$emit('commentDeleted', comment.id)"
-              @edit-clicked="$emit('commentEdit', comment.id)"
+              @edit-clicked="commentToEditId = comment.id"
             />
           </div>
         </div>
+        <v-form
+          v-if="commentToEditId === comment.id"
+          class="mt-5"
+          @submit.prevent="submitEdit(comment.id, comment.text)"
+        >
+          <v-textarea
+            v-model="comment.text"
+            label="Комментарий"
+            placeholder="Введите комментарий"
+          />
+          <div class="d-flex justify-end ga-5">
+            <v-btn class="mt-2" @click="commentToEditId = 0">Отменить</v-btn>
+            <submit-button text="Сохранить" :is-disabled="!comment.text.length" />
+          </div>
+        </v-form>
       </v-list-item>
     </v-list>
   </div>
