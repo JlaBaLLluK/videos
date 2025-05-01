@@ -1,5 +1,14 @@
 <script setup>
-defineProps(['text']);
+defineProps({
+  text: {
+    type: String,
+    default: '',
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false
+  }
+});
 </script>
 
 <template>
@@ -9,5 +18,6 @@ defineProps(['text']);
     width="200"
     class="mt-2"
     :text="text"
+    :disabled="isDisabled"
   />
 </template>

@@ -6,6 +6,7 @@ import {getVideo} from '@/api/video.js';
 import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import baseAPI from '@/api/api.js';
+import CommentsList from '@/components/comment/CommentsList.vue';
 
 const route = useRoute();
 
@@ -40,6 +41,16 @@ async function dislikeClicked() {
 
   video.value.likes_count = response.data.new_likes_count;
   video.value.dislikes_count = response.data.new_dislikes_count;
+}
+
+async function fetchComments() {
+  const response = await baseAPI.get('comment/comments', {params: {by_video: video.value.id}});
+  video.value.comments = response.data;
+}
+
+async function deleteComment(commentId) {
+  await baseAPI.delete(`comment/comments/${commentId}/`);
+  await fetchComments();
 }
 
 onMounted(async () => {
@@ -113,6 +124,14 @@ onMounted(async () => {
         </p>
       </v-card-text>
     </v-card>
+    <div class="mt-5 w-50">
+      <comments-list
+        v-model="video.comments"
+        class="mt-5"
+        @comment-published="fetchComments"
+        @comment-deleted="deleteComment"
+      />
+    </div>
   </div>
 </template>
 

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from . import models
 
 from apps.core import utils as core_utils
+from apps.core import serializers as core_serializers
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
@@ -16,19 +17,13 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 
 class CommentsListSerializer(serializers.ModelSerializer):
+    author = core_serializers.UserListSerializer()
     text_preview = serializers.SerializerMethodField()
     published_ago = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Comment
-        fields = (
-            "text",
-            "created_at",
-            "author",
-            "likes_count",
-            "dislikes_count",
-            "text_preview",
-        )
+        fields = "__all__"
 
     @staticmethod
     def get_text_preview(obj):

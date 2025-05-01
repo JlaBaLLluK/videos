@@ -5,6 +5,7 @@ from . import models, mixins
 from apps.core import serializers as core_serializers
 from apps.core import mixins as core_mixins
 from apps.core import utils as core_utils
+from apps.comment import serializers as comment_serializers
 
 
 class VideoEditSerializer(
@@ -59,6 +60,7 @@ class VideoDetailSerializer(mixins.VideoSerializerMixin, serializers.ModelSerial
     author = core_serializers.UserDetailSerializer()
     is_request_user_liked = serializers.SerializerMethodField()
     is_request_user_disliked = serializers.SerializerMethodField()
+    comments = comment_serializers.CommentsListSerializer(many=True)
 
     class Meta:
         model = models.Video
