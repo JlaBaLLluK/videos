@@ -185,11 +185,6 @@ class SearchView(APIView):
         "channels": serializers.UserListSerializer,
         "playlists": playlist_serializers.PlaylistsListSerializer,
     }
-    videos_sort_lookups = {
-        "newest": "-created_at",
-        "oldest": "created_at",
-        "popular": "views_count",
-    }
     channels_sort_annotations = {
         "subscribers": {
             "annotation_name": "subscribers_count_annotation",
@@ -209,6 +204,10 @@ class SearchView(APIView):
             "annotation_name": "updated_at",
             "annotation_func": None,
         },
+    }
+    sort_orders = {
+        '0': '',
+        '1': '-'
     }
 
     def get_response_data(self):
@@ -237,16 +236,17 @@ class SearchView(APIView):
         if not sort_by:
             return queryset
 
+        is_descending_order = self.request.query_params.get("is_descending_order")
+        sort_order = self.sort_orders[is_descending_order]
         if content_type == "videos":
-            return queryset.order_by(self.videos_sort_lookups[sort_by])
-
-        if content_type == "channels":
+            order_by = f"{sort_order}{sort_by}"
+        elif content_type == "channels":
             annotation = self.channels_sort_annotations[sort_by]
-            return queryset.annotate(
+            queryset = queryset.annotate(
                 **{annotation["annotation_name"]: annotation["annotation_func"]}
-            ).order_by(f"-{annotation['annotation_name']}")
-
-        if content_type == "playlists":
+            )
+            order_by = f"{sort_order}{annotation['annotation_name']}"
+        else:
             annotation = self.playlists_sort_annotations[sort_by]
             annotation_func = annotation["annotation_func"]
             if annotation_func:
@@ -254,9 +254,9 @@ class SearchView(APIView):
                     **{annotation["annotation_name"]: annotation["annotation_func"]}
                 )
 
-            return queryset.order_by(f"-{annotation['annotation_name']}")
+            order_by = f"{sort_order}{annotation['annotation_name']}"
 
-        return queryset
+        return queryset.order_by(order_by)
 
     def get(self, request):
         response_data = self.get_response_data()

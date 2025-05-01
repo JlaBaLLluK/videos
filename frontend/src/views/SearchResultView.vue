@@ -14,6 +14,7 @@ const router = useRouter();
 const displayFilterBlock = ref(false);
 const contentType = ref();
 const sorting = ref();
+const isDescendingOrder = ref(true);
 const data = ref({});
 const loading = ref(true);
 
@@ -33,17 +34,17 @@ const CONTENT_TYPE_RADIOS = [
 ];
 const VIDEOS_SORT_RADIOS = [
   {
-    label: 'Сначала новые',
-    value: 'newest'
+    label: 'По дате публикации',
+    value: 'created_at'
   },
   {
-    label: 'Сначала старые',
-    value: 'oldest'
+    label: 'По числу просмотров',
+    value: 'views_count'
   },
   {
-    label: 'Сначала популярные',
-    value: 'popular'
-  }
+    label: 'По числу лайков',
+    value: 'likes_count'
+  },
 ];
 const CHANNELS_SORT_RADIOS = [
   {
@@ -78,7 +79,19 @@ watch(() => sorting.value,
     data.value = await search({
       search_query: route.query.search_query,
       content_type: contentType.value,
-      sort_by: newValue
+      sort_by: newValue,
+      is_descending_order: isDescendingOrder.value ? 1 : 0,
+    });
+    loading.value = false;
+  });
+watch(() => isDescendingOrder.value,
+  async (newValue) => {
+    loading.value = true;
+    data.value = await search({
+      search_query: route.query.search_query,
+      content_type: contentType.value,
+      sort_by: sorting.value,
+      is_descending_order: newValue ? 1 : 0,
     });
     loading.value = false;
   });
@@ -110,11 +123,29 @@ onMounted(async () => {
         <span class="fw-bold fs-5">Тип</span>
         <filters-radio-group v-model="contentType" :items="CONTENT_TYPE_RADIOS" />
       </div>
-      <div v-if="contentType" style="width: 245px">
+      <div v-if="contentType" style="width: 270px">
         <span class="fw-bold fs-5">Упорядочить</span>
-        <filters-radio-group v-if="contentType === 'videos'" v-model="sorting" :items="VIDEOS_SORT_RADIOS" />
-        <filters-radio-group v-else-if="contentType === 'channels'" v-model="sorting" :items="CHANNELS_SORT_RADIOS" />
-        <filters-radio-group v-else-if="contentType === 'playlists'" v-model="sorting" :items="PLAYLISTS_SORT_RADIOS" />
+        <filters-radio-group
+          v-if="contentType === 'videos'"
+          v-model="sorting"
+          v-model:is-descending-order="isDescendingOrder"
+          :items="VIDEOS_SORT_RADIOS"
+          :need-change-sort-order="true"
+        />
+        <filters-radio-group
+          v-else-if="contentType === 'channels'"
+          v-model="sorting"
+          v-model:is-descending-order="isDescendingOrder"
+          :items="CHANNELS_SORT_RADIOS"
+          :need-change-sort-order="true"
+        />
+        <filters-radio-group
+          v-else-if="contentType === 'playlists'"
+          v-model="sorting"
+          v-model:is-descending-order="isDescendingOrder"
+          :items="PLAYLISTS_SORT_RADIOS"
+          :need-change-sort-order="true"
+        />
       </div>
     </div>
     <h4 v-if="!data || (!data.videos?.length && !data.channels?.length && !data.playlists?.length)">По Вашему запросу ничего не найдено</h4>
@@ -126,7 +157,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>
