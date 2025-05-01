@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 
 from apps.core import permissions as core_permissions, models as core_models
 from apps.core import authentication
@@ -53,6 +54,12 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     }
     creator_field = "author"
 
+    def get_authenticators(self):
+        if self.request.GET.get("my-published"):
+            self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
+
+        return super().get_authenticators()
+
     def get_queryset(self):
         if self.request.query_params.get("my-published"):
             return self.request.user.uploaded_videos.order_by("-created_at")
@@ -100,7 +107,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             models.LikesHistory.objects.create(
                 video=video, user=request.user
             )  # 'add' method doesn't throw an exception
-            response_message = "Set like"
+            is_set = True
             video.likes_count += 1
             if request.user in video.users_disliked_video.all():
                 video.dislikes_count -= 1
@@ -108,11 +115,17 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
 
         except IntegrityError:
             video.users_liked_video.remove(request.user)
-            response_message = "Removed like"
+            is_set = False
             video.likes_count -= 1
 
         video.save()
-        return Response({"message": response_message})
+        return Response(
+            {
+                "is_set": is_set,
+                "new_likes_count": video.likes_count,
+                "new_dislikes_count": video.dislikes_count,
+            }
+        )
 
     @extend_schema(description="Dislike video by user")
     @action(methods=["POST"], detail=True)
@@ -122,7 +135,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             models.DislikesHistory.objects.create(
                 video=video, user=request.user
             )  # 'add' method doesn't throw an exception
-            response_message = "Set dislike"
+            is_set = True
             video.dislikes_count += 1
             if request.user in video.users_liked_video.all():
                 video.likes_count -= 1
@@ -130,11 +143,17 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
 
         except IntegrityError:
             video.users_disliked_video.remove(request.user)
-            response_message = "Removed dislike"
+            is_set = False
             video.dislikes_count -= 1
 
         video.save()
-        return Response({"message": response_message})
+        return Response(
+            {
+                "is_set": is_set,
+                "new_dislikes_count": video.dislikes_count,
+                "new_likes_count": video.likes_count,
+            }
+        )
 
     @extend_schema(description="List of disliked by user videos")
     @action(methods=["GET"], detail=False, url_path="my-watched")

@@ -25,6 +25,11 @@ export async function editVideo(videoId, data) {
   }
 }
 
+export async function getVideo(videoId) {
+  const response = await baseAPI.get(`video/videos/${videoId}/`);
+  return response.data;
+}
+
 export async function deleteVideo(videoId) {
   await baseAPI.delete(`video/videos/${videoId}/`);
   await getMe();
@@ -32,10 +37,5 @@ export async function deleteVideo(videoId) {
 
 export async function addOrRemoveToWatchLater(videoId) {
   const response = await baseAPI.post('video/videos/watch-later/', {video_id: videoId});
-  return response.data;
-}
-
-export async function watchLaterVideos() {
-  const response = await baseAPI.get('video/videos/watch-later/');
   return response.data;
 }

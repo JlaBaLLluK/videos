@@ -36,12 +36,19 @@ const videos = defineModel();
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex ga-3 w-100">
             <video-preview
-              :text-placeholder="video.title"
               :photo="video.preview"
+              class="cursor-pointer"
+              @click="$router.push({name: 'videoDetail', params: {id: video.id}})"
             />
             <div class="d-flex flex-column w-100">
               <div class="d-flex justify-space-between">
-                <span class="fw-bold" style="font-size: 18px">{{ video.title }}</span>
+                <span
+                  class="fw-bold cursor-pointer"
+                  style="font-size: 18px"
+                  @click="$router.push({name: 'videoDetail', params: {id: video.id}})"
+                >
+                  {{ video.title }}
+                </span>
                 <slot name="actions" :videoId="video.id"></slot>
               </div>
               <span>Просмотров: {{ video.views_count }}</span>

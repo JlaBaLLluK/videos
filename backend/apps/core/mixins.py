@@ -6,6 +6,8 @@ from django.core.files.base import ContentFile
 
 from rest_framework import serializers
 
+from . import utils
+
 
 class ActionsSerializersMapMixin:
     actions_serializers_map = {}
@@ -76,12 +78,7 @@ class UserSerializerMixin(metaclass=serializers.SerializerMetaclass):
 
     @staticmethod
     def get_description_preview(instance):
-        description_parts = instance.description.split()
-        description_preview_parts = description_parts[:25]
-        if len(description_preview_parts) < len(description_parts):
-            description_preview_parts[-1] += "..."
-
-        return " ".join(description_preview_parts)
+        return utils.get_text_preview(instance.description, words_count=25)
 
     def get_is_request_user_subscribed(self, instance):
         user = self.context["request"].user

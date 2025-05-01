@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from django.utils import timezone
 
-from . import models
-from apps.core import serializers_fields
+
+from . import models, mixins
+from apps.core import serializers as core_serializers
 from apps.core import mixins as core_mixins
+from apps.core import utils as core_utils
 
 
 class VideoEditSerializer(
@@ -34,8 +35,7 @@ class VideoCreateSerializer(VideoEditSerializer):
         }
 
 
-class VideosListSerializer(serializers.ModelSerializer):
-    published_ago = serializers.SerializerMethodField()
+class VideosListSerializer(mixins.VideoSerializerMixin, serializers.ModelSerializer):
     author_channel_name = serializers.CharField(source="author.channel_name")
     author_profile_photo = serializers.ImageField(source="author.profile_photo")
     author_username = serializers.CharField(source="author.username")
@@ -53,49 +53,29 @@ class VideosListSerializer(serializers.ModelSerializer):
             "author_username",
         )
 
-    @staticmethod
-    def get_published_ago(obj):
-        time_passed = timezone.now() - obj.created_at
-        days = time_passed.days
-        seconds = time_passed.seconds
-        if days >= 365:
-            return f"{days // 365} г. назад"
 
-        if days >= 30:
-            return f"{days // 30} мес. назад"
-
-        if days >= 1:
-            return f"{days} д. назад"
-
-        if seconds >= 3600:
-            return f"{seconds // 3600} ч. назад"
-
-        return f"{seconds // 60} мин. назад"
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        views_placeholder = ""
-        if data["views_count"] >= 1_000_000:
-            views_placeholder = "млн."
-            data["views_count"] //= 1_000_000
-        elif data["views_count"] >= 1_000:
-            views_placeholder = "тыс."
-            data["views_count"] //= 1_000
-
-        data["views_count"] = f'{data["views_count"]} {views_placeholder}'
-        return data
-
-
-class VideoDetailSerializer(serializers.ModelSerializer):
-    author = serializers_fields.UserReadOnlyField()
+class VideoDetailSerializer(mixins.VideoSerializerMixin, serializers.ModelSerializer):
+    description_preview = serializers.SerializerMethodField()
+    author = core_serializers.UserDetailSerializer()
+    is_request_user_liked = serializers.SerializerMethodField()
+    is_request_user_disliked = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Video
         fields = "__all__"
 
-    def get_fields(self):
-        fields = super().get_fields()
-        fields["views_count"].read_only = True
-        fields["likes_count"].read_only = True
-        fields["dislikes_count"].read_only = True
-        return fields
+    @staticmethod
+    def get_description_preview(obj):
+        return core_utils.get_text_preview(obj.description, words_count=35)
+
+    def get_is_request_user_liked(self, obj):
+        return (
+            self.context["request"].user.is_authenticated
+            and self.context["request"].user in obj.users_liked_video.all()
+        )
+
+    def get_is_request_user_disliked(self, obj):
+        return (
+            self.context["request"].user.is_authenticated
+            and self.context["request"].user in obj.users_disliked_video.all()
+        )

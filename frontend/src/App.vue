@@ -76,11 +76,12 @@ onUnmounted(() => {
           <div class="w-25 h-100 d-flex">
             <v-text-field
               v-model="searchQuery"
-              class="pl-3"
+              class="pl-3 search-field"
               placeholder="Введите запрос"
               clearable
               style="box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); border-radius: 15px;"
               variant="plain"
+              hide-details
               density="comfortable"
             />
             <v-btn icon @click="router.push({name: 'searchResult', query: {search_query: searchQuery}})">
@@ -186,5 +187,11 @@ header a {
   font-size: 18px;
 }
 
-
+:deep(.search-field .v-field__input) {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  height: 100% !important;
+  align-items: center;
+}
 </style>
