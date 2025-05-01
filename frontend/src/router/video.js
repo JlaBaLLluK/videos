@@ -23,5 +23,15 @@ export const videoRoutes = [
     path: '/watch-later',
     name: 'watchLater',
     component: () => import('@/views/video/VideosListView.vue')
-  }
+  },
+  {
+    path: '/views-history',
+    name: 'viewsHistory',
+    component: () => import('@/views/video/VideosListView.vue')
+  },
+  {
+    path: '/likes-history',
+    name: 'likesHistory',
+    component: () => import('@/views/video/VideosListView.vue')
+  },
 ];

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.video",
     "apps.playlist",
+    "apps.comment",
     # third-party apps
     "rest_framework",
     "corsheaders",

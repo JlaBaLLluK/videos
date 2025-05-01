@@ -46,6 +46,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         "liked_by_user": [IsAuthenticated],
         "user_videos": [IsAuthenticated],
         "watch_later": [IsAuthenticated],
+        "remove_from_history": [IsAuthenticated],
     }
     authentication_classes = [authentication.JwtAuthenticationNoException]
     file_fields_and_functions = {
@@ -55,7 +56,11 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
     creator_field = "author"
 
     def get_authenticators(self):
-        if self.request.GET.get("my-published"):
+        if (
+            self.request.GET.get("my-published")
+            or self.request.GET.get("views_history")
+            or self.request.GET.get("likes_history")
+        ):
             self.authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
 
         return super().get_authenticators()
@@ -68,6 +73,12 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             return get_object_or_404(
                 core_models.User, username=username
             ).uploaded_videos.order_by("-created_at")
+
+        if self.request.query_params.get("likes_history"):
+            return self.request.user.liked_videos.all()
+
+        if self.request.query_params.get("views_history"):
+            return self.request.user.watched_videos.all()
 
         return super().get_queryset()
 
@@ -100,7 +111,11 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             utils.generate_preview(instance)
 
     @extend_schema(description="Like video by user")
-    @action(methods=["POST"], detail=True)
+    @action(
+        methods=["POST"],
+        detail=True,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    )
     def like(self, request, *args, **kwargs):
         video = self.get_object()
         try:
@@ -128,7 +143,11 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         )
 
     @extend_schema(description="Dislike video by user")
-    @action(methods=["POST"], detail=True)
+    @action(
+        methods=["POST"],
+        detail=True,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    )
     def dislike(self, request, *args, **kwargs):
         video = self.get_object()
         try:
@@ -155,25 +174,12 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             }
         )
 
-    @extend_schema(description="List of disliked by user videos")
-    @action(methods=["GET"], detail=False, url_path="my-watched")
-    def watched_by_user(
-        self, request
-    ):  # TODO: move to <get_queryset> with query params
-        serializer = self.get_serializer(
-            instance=request.user.watched_videos.order_by("-made_action_at"), many=True
-        )
-        return Response(serializer.data)
-
-    @extend_schema(description="List of liked by user videos")
-    @action(methods=["GET"], detail=False, url_path="my-liked")
-    def liked_by_user(self, request):
-        serializer = self.get_serializer(
-            instance=request.user.liked_videos.order_by("-made_action_at"), many=True
-        )
-        return Response(serializer.data)
-
-    @action(methods=["GET", "POST"], detail=False, url_path="watch-later")
+    @action(
+        methods=["GET", "POST"],
+        detail=False,
+        url_path="watch-later",
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    )
     def watch_later(self, request):
         if request.method == "GET":
             watch_later_videos_with_action_date = (
@@ -196,3 +202,14 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
             message = 'Видео убрано из плейлиста "Смотреть позже"'
 
         return Response({"message": message})
+
+    @action(
+        methods=["PUT"],
+        detail=True,
+        authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+        url_path="remove-from-history",
+    )
+    def remove_from_history(self, request, *args, **kwargs):
+        video = self.get_object()
+        video.users_watched_video.remove(request.user)
+        return Response()

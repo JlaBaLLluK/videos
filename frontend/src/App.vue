@@ -132,7 +132,7 @@ onUnmounted(() => {
               <v-list-item-title>Ваши плейлисты</v-list-item-title>
             </div>
           </v-list-item>
-          <v-list-item link>
+          <v-list-item link :to="{name: 'likesHistory'}">
             <div class="d-flex ga-3">
               <v-icon>mdi-thumb-up-outline</v-icon>
               <v-list-item-title>Понравившиеся</v-list-item-title>
@@ -144,7 +144,7 @@ onUnmounted(() => {
               <v-list-item-title>Смотреть позже</v-list-item-title>
             </div>
           </v-list-item>
-          <v-list-item link>
+          <v-list-item link :to="{name: 'viewsHistory'}">
             <div class="d-flex ga-3">
               <v-icon>mdi-history</v-icon>
               <v-list-item-title>История просмотров</v-list-item-title>
