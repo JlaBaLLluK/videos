@@ -2,8 +2,9 @@
 import DeleteEditMenu from '@/components/video/menu/DeleteEditMenu.vue';
 import SubmitButton from '@/components/buttons/SubmitButton.vue';
 import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import baseAPI from '@/api/api.js';
+import LikeDislikeButtons from '@/components/buttons/LikeDislikeButtons.vue';
 
 const emits = defineEmits(['commentEdit', 'commentDelete']);
 
@@ -16,7 +17,7 @@ const editedText = ref(comment.value.text);
 const likeIcon = ref('mdi-thumb-up');
 const dislikeIcon = ref('mdi-thumb-down');
 
-async function likeClicked() {
+async function  likeClicked() {
   const response = await baseAPI.post(`comment/comments/${comment.value.id}/like/`);
   if (response.data.is_set) {
     likeIcon.value = 'mdi-thumb-up';
@@ -30,7 +31,7 @@ async function likeClicked() {
 }
 
 async function dislikeClicked() {
-  const response = await baseAPI.post(`comment/comments/${comment.value.id}/like/`);
+  const response = await baseAPI.post(`comment/comments/${comment.value.id}/dislike/`);
   if (response.data.is_set) {
     likeIcon.value = 'mdi-thumb-up-outline';
     dislikeIcon.value = 'mdi-thumb-down';
@@ -47,6 +48,15 @@ async function submitEdit() {
   commentEdit.value = false;
   emits('commentEdit');
 }
+
+onMounted(() => {
+  if (!comment.value.is_request_user_liked) {
+    likeIcon.value += '-outline';
+  }
+  if (!comment.value.is_request_user_disliked) {
+    dislikeIcon.value += '-outline';
+  }
+});
 
 </script>
 
@@ -90,14 +100,14 @@ async function submitEdit() {
             Свернуть
           </b>
         </p>
-        <!--              <like-dislike-buttons-->
-        <!--                v-model="comments[index]"-->
-        <!--                v-model:like-icon="likeIcon"-->
-        <!--                v-model:dislike-icon="dislikeIcon"-->
-        <!--                :size="20"-->
-        <!--                @like-clicked="likeClicked(index)"-->
-        <!--                @dislike-clicked="dislikeClicked(index)"-->
-        <!--              />-->
+        <like-dislike-buttons
+          v-model="comment"
+          v-model:like-icon="likeIcon"
+          v-model:dislike-icon="dislikeIcon"
+          :size="20"
+          @like-clicked="likeClicked"
+          @dislike-clicked="dislikeClicked"
+        />
       </div>
     </div>
     <div v-if="comment.author.username === username" class="d-flex justify-end">

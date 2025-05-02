@@ -20,6 +20,8 @@ class CommentsListSerializer(serializers.ModelSerializer):
     author = core_serializers.UserListSerializer()
     text_preview = serializers.SerializerMethodField()
     published_ago = serializers.SerializerMethodField()
+    is_request_user_liked = serializers.SerializerMethodField()
+    is_request_user_disliked = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Comment
@@ -32,6 +34,18 @@ class CommentsListSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_published_ago(obj):
         return core_utils.get_creation_date_representation(obj.created_at)
+
+    def get_is_request_user_liked(self, obj):
+        return (
+            self.context["request"].user.is_authenticated
+            and self.context["request"].user in obj.users_liked_comment.all()
+        )
+
+    def get_is_request_user_disliked(self, obj):
+        return (
+            self.context["request"].user.is_authenticated
+            and self.context["request"].user in obj.users_disliked_comment.all()
+        )
 
     def to_representation(self, obj):
         data = super().to_representation(obj)
