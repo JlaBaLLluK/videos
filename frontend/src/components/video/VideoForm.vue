@@ -11,7 +11,6 @@ const videoPreview = ref(form.value.preview ? URL.createObjectURL(form.value.pre
 watch(() => form.value.preview,
   (newValue) => {
     if (newValue) {
-      console.log(newValue);
       videoPreview.value = URL.createObjectURL(newValue);
     }
   });

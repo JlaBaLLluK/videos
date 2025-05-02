@@ -24,6 +24,7 @@ async function submit() {
   try {
     errors.value = null;
     await baseAPI.post('video/videos/', form.value, {
+      timeout: 300000,
       headers: {
         'Content-Type': 'multipart/form-data',
       },

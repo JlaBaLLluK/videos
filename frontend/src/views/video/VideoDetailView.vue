@@ -17,6 +17,7 @@ const visitorUsername = ref(JSON.parse(localStorage.getItem('user'))?.username);
 const descriptionCollapsed = ref(true);
 const likeIcon = ref('mdi-thumb-up');
 const dislikeIcon = ref('mdi-thumb-down');
+const streamVideoUrl = ref('');
 
 async function likeClicked() {
   const response = await baseAPI.post(`video/videos/${video.value.id}/like/`);
@@ -63,6 +64,7 @@ onMounted(async () => {
     dislikeIcon.value += '-outline';
   }
 
+  streamVideoUrl.value = `http://${import.meta.env.VITE_API_URL}${'/api/v1/video/play-video/'}${video.value.id}/`;
   loading.value = false;
 });
 </script>
@@ -70,8 +72,13 @@ onMounted(async () => {
 <template>
   <progress-bar v-if="loading" />
   <div v-else class="d-flex flex-column">
-    <div class="d-flex justify-center">
-      <h1>БЛОК ВИДЕО</h1>
+    <div class="d-flex justify-start">
+      <video
+        controls
+        :src="streamVideoUrl"
+        height="768"
+        width="1366"
+      ></video>
     </div>
     <div class="d-flex w-50 justify-space-between">
       <div>
@@ -79,9 +86,20 @@ onMounted(async () => {
           <h3 class="fw-bold">{{ video.title }}</h3>
         </div>
         <div class="d-flex ga-3">
-          <photo-with-default :photo="video.author.profile_photo" :text-placeholder="video.author.channel_name" :size="65" />
+          <photo-with-default
+            :photo="video.author.profile_photo"
+            :text-placeholder="video.author.channel_name"
+            :size="65"
+            class="cursor-pointer"
+            @click="$router.push({name: 'profile', params: {username: video.author.username}})"
+          />
           <div class="d-flex flex-column justify-space-between">
-            <span class="fw-bold fs-5">{{ video.author.channel_name }}</span>
+            <span
+              class="fw-bold fs-5 cursor-pointer"
+              @click="$router.push({name: 'profile', params: {username: video.author.username}})"
+            >
+              {{ video.author.channel_name }}
+            </span>
             <span class="fs-5">Подписчиков: {{ video.author.subscribers_count }}</span>
           </div>
           <div class="h-100 align-c">

@@ -1,3 +1,4 @@
+from django.core.validators import FileExtensionValidator
 from rest_framework import serializers
 
 
@@ -31,7 +32,12 @@ class VideoCreateSerializer(VideoEditSerializer):
             "video": {
                 "error_messages": {
                     "required": "Видео не выбрано.",
-                }
+                },
+                "validators": [
+                    FileExtensionValidator(
+                        allowed_extensions=["mp4"], message="Недопустимый формат файла."
+                    )
+                ],
             }
         }
 

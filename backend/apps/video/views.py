@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.db.models import F
+from django.http import FileResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -86,6 +87,8 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         super().perform_create(serializer)
         if not serializer.instance.preview:
             utils.generate_preview(serializer.instance)
+
+        utils.prepare_file(serializer.instance)
 
     def retrieve(self, request, *args, **kwargs):
         video = self.get_object()
@@ -213,3 +216,47 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         video = self.get_object()
         video.users_watched_video.remove(request.user)
         return Response()
+
+
+def stream_video_view(request, pk):
+    video = get_object_or_404(models.Video, pk=pk)
+    file_path = video.video.path
+    file_size = video.video.size
+    range_header = request.headers.get("Range")
+    if not range_header:
+        return FileResponse(open(file_path, "rb"), content_type="video/mp4")
+
+    start_bytes, end_bytes = range_header.replace("bytes=", "").split("-")
+    start = int(start_bytes) if start_bytes else 0
+    end = int(end_bytes) if end_bytes else min(start + 1024 * 1024, file_size - 1)
+    range_length = end - start + 1
+
+    # оптимизация: не за раз прочитать сколько запросили, а за несколько (меньший объем занимается результатом read)
+    # def file_part_generator(path, offset, length, chunk_size=8192):
+    #     with open(path, "rb") as f:
+    #         f.seek(offset)
+    #         remaining = length
+    #         while remaining > 0:
+    #             chunk = f.read(min(chunk_size, remaining))
+    #             if not chunk:
+    #                 break
+    #             yield chunk
+    #             remaining -= len(chunk)
+
+    response = StreamingHttpResponse(
+        file_part_generator(file_path, start, range_length),
+        status=206,
+        content_type="video/mp4",
+    )
+    response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+    response["Content-Length"] = str(range_length)
+    response["Accept-Ranges"] = "bytes"
+    response["Content-Disposition"] = 'inline; filename="video.mp4"'
+    return response
+
+
+def file_part_generator(path, start_offset, read_size):
+    with open(path, "rb") as f:
+        f.seek(start_offset)
+        file_part = f.read(read_size)
+        yield file_part

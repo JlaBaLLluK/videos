@@ -7,6 +7,9 @@ import random
 
 from . import models
 
+import os
+import subprocess
+
 
 def generate_preview(video_instance):
     file_clip = VideoFileClip(video_instance.video.path)
@@ -21,3 +24,25 @@ def generate_preview(video_instance):
         models.video_preview_upload_to(video_instance, "preview.jpeg"),
         ContentFile(image_bytes.getvalue()),
     )
+
+
+def prepare_file(instance):
+    input_path = instance.video.path
+    output_path = input_path + ".tmp.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            input_path,
+            "-movflags",
+            "faststart",
+            "-c",
+            "copy",
+            output_path,
+        ],
+        check=True,
+    )
+    os.remove(input_path)
+    os.rename(output_path, input_path)
+    instance.save()
