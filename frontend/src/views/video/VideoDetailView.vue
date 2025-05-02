@@ -7,6 +7,7 @@ import PhotoWithDefault from '@/components/PhotoWithDefault.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import baseAPI from '@/api/api.js';
 import CommentsList from '@/components/comment/CommentsList.vue';
+import LikeDislikeButtons from '@/components/buttons/LikeDislikeButtons.vue';
 
 const route = useRoute();
 
@@ -89,27 +90,14 @@ onMounted(async () => {
         </div>
       </div>
       <div class="d-flex align-center">
-        <v-btn-group>
-          <v-tooltip location="bottom" text="Нравится">
-            <template v-slot:activator="{props}">
-              <v-btn icon v-bind="props" @click="likeClicked">
-                <v-icon size="30">{{ likeIcon }}</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-          <div class="d-flex align-center ga-2" style="font-size: 20px">
-            <span>{{ video.likes_count }}</span>
-            <div style="border-right: solid 1px #b3b2b2; height: 40px"></div>
-            <span>{{ video.dislikes_count }}</span>
-          </div>
-          <v-tooltip location="bottom" text="Не нравится">
-            <template v-slot:activator="{props}">
-              <v-btn icon v-bind="props" @click="dislikeClicked">
-                <v-icon size="30">{{ dislikeIcon }}</v-icon>
-              </v-btn>
-            </template>
-          </v-tooltip>
-        </v-btn-group>
+        <like-dislike-buttons
+          v-model="video"
+          v-model:likeIcon="likeIcon"
+          v-model:dislikeIcon="dislikeIcon"
+          :size="35"
+          @like-clicked="likeClicked"
+          @dislike-clicked="dislikeClicked"
+        />
       </div>
     </div>
     <v-card class="mt-5 text-justify w-50">
