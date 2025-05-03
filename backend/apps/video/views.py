@@ -111,7 +111,7 @@ class VideoViewSet(core_mixins.CreateObjectWithIdInFilePathMixin, ModelViewSet):
         instance.preview.delete(save=False)
         super().perform_update(serializer)
         if not serializer.instance.preview:
-            utils.generate_preview(instance)
+            utils.generate_preview(serializer.instance)
 
     @extend_schema(description="Like video by user")
     @action(
