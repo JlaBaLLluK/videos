@@ -5,6 +5,7 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 from rest_framework_simplejwt import serializers as jwt_serializer
@@ -165,6 +166,7 @@ class UserUpdateSerializer(
 
 class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
     created_at = serializers.DateTimeField(format=api_settings.DATE_FORMAT)
+    total_views_count = serializers.SerializerMethodField()
 
     class Meta(UserUpdateSerializer.Meta):
         fields = UserUpdateSerializer.Meta.fields + (
@@ -175,7 +177,15 @@ class UserDetailSerializer(mixins.UserSerializerMixin, UserUpdateSerializer):
             "videos_count",
             "description_preview",
             "is_request_user_subscribed",
+            "total_views_count",
         )
+
+    @staticmethod
+    def get_total_views_count(obj):
+        total_views_count = obj.uploaded_videos.aggregate(
+            total_views_count=Sum("views_count")
+        )["total_views_count"]
+        return total_views_count
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

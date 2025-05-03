@@ -104,7 +104,7 @@ onMounted(async () => {
         </div>
       </div>
       <div class="d-flex ga-5 mt-3">
-        <reset-button v-model="form" :initial="initial" />
+        <reset-button v-model="form" :initial="initial" :init-with-json="true" />
         <submit-button text="Сохранить" />
       </div>
     </v-form>

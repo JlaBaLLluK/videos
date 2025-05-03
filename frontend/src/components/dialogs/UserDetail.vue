@@ -46,7 +46,7 @@ const model = defineModel();
           <v-list-item class="pa-0">
             <div class="d-flex ga-3">
               <v-icon>mdi-trending-up</v-icon>
-              <v-list-item-title>ЧИСЛО ПРОСМОТРОВ ВИДЕО просмотров</v-list-item-title>
+              <v-list-item-title>{{ user.total_views_count }} просмотров</v-list-item-title>
             </div>
           </v-list-item>
         </v-list>

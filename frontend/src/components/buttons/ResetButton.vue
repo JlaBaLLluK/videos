@@ -1,7 +1,25 @@
 <script setup>
-defineProps(['initial']);
+
+import {onMounted, ref} from 'vue';
+
+const props = defineProps({
+  initial: {
+    type: Object,
+    required: true
+  },
+  initWithJson: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const form = defineModel();
+
+const correctFormatData = ref({});
+
+onMounted(() => {
+  correctFormatData.value = props.initWithJson ? JSON.parse(JSON.stringify(props.initial)) : {...props.initial};
+});
 
 </script>
 
@@ -11,6 +29,6 @@ const form = defineModel();
     width="200"
     class="mt-2"
     text="Отмена"
-    @click="form = JSON.parse(JSON.stringify(initial))"
+    @click="form = initWithJson ? JSON.parse(JSON.stringify(initial)) : {...initial}"
   />
 </template>
