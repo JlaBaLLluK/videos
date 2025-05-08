@@ -38,7 +38,7 @@ class ModelViewSet(
 )
 @extend_schema(tags=["User"])
 class UserViewSet(ModelViewSet):
-    queryset = models.User.objects.filter()
+    queryset = models.User.objects.all()
     serializer_class = serializers.UserListSerializer
     actions_serializers_map = {
         "list": serializer_class,
@@ -205,10 +205,7 @@ class SearchView(APIView):
             "annotation_func": None,
         },
     }
-    sort_orders = {
-        '0': '',
-        '1': '-'
-    }
+    sort_orders = {"0": "", "1": "-"}
 
     def get_response_data(self):
         query = self.request.query_params.get("search_query")

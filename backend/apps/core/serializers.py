@@ -60,8 +60,6 @@ class UserListSerializer(mixins.UserSerializerMixin, serializers.ModelSerializer
 class UserCreateSerializer(
     mixins.SendEmailSerializerMixin, serializers.ModelSerializer
 ):
-    username = serializers.CharField()
-    email = serializers.EmailField()
     password = serializers_fields.PasswordField()
     password_confirm = serializers_fields.PasswordField()
     confirmation_code = serializers.CharField(read_only=True)
@@ -92,10 +90,10 @@ class UserCreateSerializer(
         password = validated_data.pop("password")
         code = validated_data.pop("confirmation_code")
         user = User(**validated_data)
+        user.validate_unique()
         self._confirmation_code = code
         user.is_active = False
         user.set_password(password)
-        user.validate_unique(exclude=[])
         user.save()
         self.instance = user
         self.send_email(

@@ -112,7 +112,12 @@ onUnmounted(() => {
           </div>
         </nav>
       </v-app-bar>
-      <v-navigation-drawer v-if="showSidebar" :width="260" :rail="isSidebarCollapsed">
+      <v-navigation-drawer
+        v-if="showSidebar"
+        :width="260"
+        :rail="isSidebarCollapsed"
+        :mobile-breakpoint="500"
+      >
         <v-list class="d-flex flex-column h-100">
           <v-list-item link :to="{name: 'subscriptionsList'}">
             <div class="d-flex ga-3">
